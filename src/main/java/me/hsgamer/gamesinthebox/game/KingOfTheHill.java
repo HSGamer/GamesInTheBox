@@ -144,7 +144,7 @@ public class KingOfTheHill extends ArenaGame {
                     pointFeature.applyPoint(uuid, -pointMinus);
                 }
             }
-            if (maxPlayersToAddPoint < 0 || playersToAdd.size() > maxPlayersToAddPoint) {
+            if (maxPlayersToAddPoint < 0 || playersToAdd.size() <= maxPlayersToAddPoint) {
                 playersToAdd.forEach(uuid -> pointFeature.applyPoint(uuid, pointAdd));
             } else {
                 playersToAdd.forEach(uuid -> pointFeature.applyPoint(uuid, 0));
