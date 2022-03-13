@@ -42,19 +42,17 @@ public final class ArenaUtils {
                 .orElse("");
     }
 
-    public static String getTopName(Arena arena, int index) {
+    public static Optional<String> getTopName(Arena arena, int index) {
         return arena.getArenaFeature(TopFeature.class)
                 .getTop(index)
                 .map(Pair::getKey)
                 .map(Bukkit::getOfflinePlayer)
-                .map(OfflinePlayer::getName)
-                .orElse("");
+                .map(OfflinePlayer::getName);
     }
 
-    public static String getTopValue(Arena arena, int index) {
+    public static Optional<String> getTopValue(Arena arena, int index) {
         return arena.getArenaFeature(TopFeature.class)
                 .getTop(index)
-                .map(Pair::getValue)
-                .orElse("");
+                .map(Pair::getValue);
     }
 }

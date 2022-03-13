@@ -29,8 +29,8 @@ public class HDHologramProvider implements HologramProvider {
             for (int i = 0; i < instance.getMainConfig().getMaxTopDisplay(); i++) {
                 String selector = name + ":" + i;
                 int finalI = i;
-                HologramsAPI.registerPlaceholder(instance, "{" + pluginName + "_top_name_" + selector + "}", 1, () -> arenaManager.getArenaByName(name).map(a -> ArenaUtils.getTopName(a, finalI)).orElse(""));
-                HologramsAPI.registerPlaceholder(instance, "{" + pluginName + "_top_value_" + selector + "}", 1, () -> arenaManager.getArenaByName(name).map(a -> ArenaUtils.getTopValue(a, finalI)).orElse(""));
+                HologramsAPI.registerPlaceholder(instance, "{" + pluginName + "_top_name_" + selector + "}", 1, () -> arenaManager.getArenaByName(name).flatMap(a -> ArenaUtils.getTopName(a, finalI)).orElse(instance.getMainConfig().getNullTopName()));
+                HologramsAPI.registerPlaceholder(instance, "{" + pluginName + "_top_value_" + selector + "}", 1, () -> arenaManager.getArenaByName(name).flatMap(a -> ArenaUtils.getTopValue(a, finalI)).orElse(instance.getMainConfig().getNullTopValue()));
             }
         });
     }

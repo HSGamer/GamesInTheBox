@@ -14,4 +14,14 @@ public interface MainConfig {
     default int getMaxTopDisplay() {
         return 5;
     }
+
+    @ConfigPath("null-top-name")
+    default String getNullTopName() {
+        return "---";
+    }
+
+    @ConfigPath("null-top-value")
+    default String getNullTopValue() {
+        return "---";
+    }
 }

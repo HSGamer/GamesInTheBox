@@ -77,12 +77,12 @@ public final class GamesInTheBox extends BasePlugin {
                     if (params.startsWith("top_name_")) {
                         String selector = params.substring("top_name_".length());
                         Pair<String, Integer> pair = ArenaUtils.parseSelector(selector);
-                        return arenaManager.getArenaByName(pair.getKey()).map(a -> ArenaUtils.getTopName(a, pair.getValue())).orElse("");
+                        return arenaManager.getArenaByName(pair.getKey()).flatMap(a -> ArenaUtils.getTopName(a, pair.getValue())).orElse(mainConfig.getNullTopName());
                     }
                     if (params.startsWith("top_value_")) {
                         String selector = params.substring("top_value_".length());
                         Pair<String, Integer> pair = ArenaUtils.parseSelector(selector);
-                        return arenaManager.getArenaByName(pair.getKey()).map(a -> ArenaUtils.getTopValue(a, pair.getValue())).orElse("");
+                        return arenaManager.getArenaByName(pair.getKey()).flatMap(a -> ArenaUtils.getTopValue(a, pair.getValue())).orElse(mainConfig.getNullTopValue());
                     }
                     return null;
                 }
