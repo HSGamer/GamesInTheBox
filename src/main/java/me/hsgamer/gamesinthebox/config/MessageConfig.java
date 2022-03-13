@@ -48,6 +48,22 @@ public interface MessageConfig {
         return "&cThe arena {name} does not have enough players to give rewards";
     }
 
+    @ConfigPath(value = "hologram-template.description", converter = StringListConverter.class)
+    default List<String> getHologramDescription() {
+        return List.of(
+                "&c&lDescription",
+                "{description}"
+        );
+    }
+
+    @ConfigPath(value = "hologram-template.top-description", converter = StringListConverter.class)
+    default List<String> getHologramTopDescription() {
+        return List.of(
+                "&c&lTop Description",
+                "{description}"
+        );
+    }
+
     @ConfigPath("state.idling")
     default String getIdlingState() {
         return "&7Idling...";
