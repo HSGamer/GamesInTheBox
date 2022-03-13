@@ -52,13 +52,13 @@ public abstract class ArenaGame implements Initializer {
     }
 
     public final Map<String, Object> getValues(String path, boolean deep) {
-        Map<String, Object> values = configFeature.getValues(getSettingPath(path), deep);
-        for (Map.Entry<String, Object> entry : configFeature.getValues(getCommonPath(path), deep).entrySet()) {
-            if (!values.containsKey(entry.getKey())) {
-                values.put(entry.getKey(), entry.getValue());
-            }
+        if (containsSetting(path)) {
+            return configFeature.getValues(getSettingPath(path), deep);
+        } else if (containsCommon(path)) {
+            return configFeature.getValues(getCommonPath(path), deep);
+        } else {
+            return Collections.emptyMap();
         }
-        return values;
     }
 
     public final boolean containsSetting(String path) {
