@@ -7,6 +7,7 @@ import me.hsgamer.gamesinthebox.api.HologramProvider;
 import me.hsgamer.gamesinthebox.hologram.hd.HDHologramProvider;
 import me.hsgamer.gamesinthebox.hologram.none.NoneHologramProvider;
 import me.hsgamer.gamesinthebox.util.LocationUtils;
+import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.hscore.common.CollectionUtils;
 import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
@@ -109,6 +110,8 @@ public class HologramFeature extends ArenaFeature<HologramFeature.ArenaHologramF
                         newTexts.add(text);
                     }
                 }
+                newTexts.replaceAll(game::replace);
+                newTexts.replaceAll(MessageUtils::colorize);
                 hologram.setLines(newTexts);
             });
         }
