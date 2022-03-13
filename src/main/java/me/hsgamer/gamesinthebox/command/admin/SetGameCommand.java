@@ -3,6 +3,7 @@ package me.hsgamer.gamesinthebox.command.admin;
 import me.hsgamer.gamesinthebox.GamesInTheBox;
 import me.hsgamer.gamesinthebox.Permissions;
 import me.hsgamer.gamesinthebox.feature.GameFeature;
+import me.hsgamer.gamesinthebox.feature.HologramFeature;
 import me.hsgamer.gamesinthebox.state.IdlingState;
 import me.hsgamer.hscore.bukkit.command.sub.SubCommand;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
@@ -43,6 +44,7 @@ public class SetGameCommand extends SubCommand {
             return;
         }
         gameFeature.setCurrentGame(gameName);
+        arena.getArenaFeature(HologramFeature.class).updateHolograms();
         MessageUtils.sendMessage(sender, instance.getMessageConfig().getSuccess());
     }
 
