@@ -1,23 +1,30 @@
 package me.hsgamer.gamesinthebox.feature;
 
 import me.hsgamer.gamesinthebox.GamesInTheBox;
+import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.api.Hologram;
 import me.hsgamer.gamesinthebox.api.HologramProvider;
 import me.hsgamer.gamesinthebox.hologram.hd.HDHologramProvider;
 import me.hsgamer.gamesinthebox.hologram.none.NoneHologramProvider;
 import me.hsgamer.gamesinthebox.util.LocationUtils;
+import me.hsgamer.hscore.common.CollectionUtils;
+import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import me.hsgamer.minigamecore.base.ArenaFeature;
 import me.hsgamer.minigamecore.base.Feature;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class HologramFeature extends ArenaFeature<HologramFeature.ArenaHologramFeature> {
+    private final GamesInTheBox instance;
     private final HologramProvider hologramProvider;
 
     public HologramFeature(GamesInTheBox instance) {
+        this.instance = instance;
         if (Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays")) {
             hologramProvider = new HDHologramProvider(instance);
         } else {
@@ -48,50 +55,68 @@ public class HologramFeature extends ArenaFeature<HologramFeature.ArenaHologramF
 
     public class ArenaHologramFeature implements Feature {
         private final Arena arena;
-        private Hologram topDescriptionHologram;
-        private Hologram descriptionHologram;
+        private final List<Pair<Hologram, List<String>>> holograms;
 
         public ArenaHologramFeature(Arena arena) {
             this.arena = arena;
+            this.holograms = new ArrayList<>();
         }
 
         @Override
         public void init() {
-            ConfigFeature.ArenaConfigFeature config = arena.getArenaFeature(ConfigFeature.class);
-            if (config.contains("hologram.top-description")) {
-                Location location = LocationUtils.getLocation(config.getString("hologram.top-description", ""));
-                if (location != null) {
-                    topDescriptionHologram = hologramProvider.createHologram(location);
-                    topDescriptionHologram.init();
-                }
-            }
-            if (config.contains("hologram.description")) {
-                Location location = LocationUtils.getLocation(config.getString("hologram.description", ""));
-                if (location != null) {
-                    descriptionHologram = hologramProvider.createHologram(location);
-                    descriptionHologram.init();
-                }
-            }
+            arena.getArenaFeature(ConfigFeature.class).getValues("hologram", false).forEach((k, v) -> {
+                if (!(v instanceof Map)) return;
+                //noinspection unchecked
+                Map<String, Object> map = (Map<String, Object>) v;
+
+                if (!map.containsKey("location")) return;
+                List<String> rawLocations = CollectionUtils.createStringListFromObject(map.getOrDefault("location", ""), true);
+                List<Location> locations = new ArrayList<>();
+                rawLocations.forEach(rawLocation -> {
+                    Location location = LocationUtils.getLocation(rawLocation);
+                    if (location != null) {
+                        locations.add(location);
+                    }
+                });
+                if (locations.isEmpty()) return;
+
+                List<String> texts = CollectionUtils.createStringListFromObject(map.getOrDefault("lines", instance.getMessageConfig().getDefaultHologramTemplate()), false);
+                if (texts.isEmpty()) return;
+
+                locations.forEach(location -> {
+                    Hologram hologram = hologramProvider.createHologram(location);
+                    hologram.init();
+                    holograms.add(Pair.of(hologram, texts));
+                });
+            });
         }
 
-        public Optional<Hologram> getTopDescriptionHologram() {
-            return Optional.ofNullable(topDescriptionHologram);
-        }
+        public void updateHolograms() {
+            ArenaGame game = arena.getArenaFeature(GameFeature.class).getCurrentGame();
+            List<String> description = game.getDescription();
+            List<String> topDescription = game.getTopDescription();
 
-        public Optional<Hologram> getDescriptionHologram() {
-            return Optional.ofNullable(descriptionHologram);
+            holograms.forEach(pair -> {
+                Hologram hologram = pair.getKey();
+                List<String> texts = pair.getValue();
+                List<String> newTexts = new ArrayList<>();
+                for (String text : texts) {
+                    if (text.equalsIgnoreCase("{description}")) {
+                        newTexts.addAll(description);
+                    } else if (text.equalsIgnoreCase("{top-description}")) {
+                        newTexts.addAll(topDescription);
+                    } else {
+                        newTexts.add(text);
+                    }
+                }
+                hologram.setLines(newTexts);
+            });
         }
 
         @Override
         public void clear() {
-            if (topDescriptionHologram != null) {
-                topDescriptionHologram.clear();
-                topDescriptionHologram = null;
-            }
-            if (descriptionHologram != null) {
-                descriptionHologram.clear();
-                descriptionHologram = null;
-            }
+            holograms.forEach(hologramListPair -> hologramListPair.getKey().clear());
+            holograms.clear();
         }
     }
 }

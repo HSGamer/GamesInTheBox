@@ -132,7 +132,8 @@ public abstract class ArenaGame implements Initializer {
         for (Map.Entry<String, Object> entry : replace.entrySet()) {
             str = str.replace("{" + entry.getKey() + "}", Objects.toString(entry.getValue()));
         }
-        str = str.replace("{name}", name);
+        str = str.replace("{name}", name)
+                .replace("{display-name}", getDisplayName());
         return str;
     }
 
