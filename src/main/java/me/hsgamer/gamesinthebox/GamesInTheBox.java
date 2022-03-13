@@ -32,6 +32,7 @@ public final class GamesInTheBox extends BasePlugin {
 
     @Override
     public void enable() {
+        Permissions.addPermissions();
         arenaManager.init();
         registerCommand(new AdminCommand(this));
     }
@@ -95,6 +96,7 @@ public final class GamesInTheBox extends BasePlugin {
     @Override
     public void disable() {
         arenaManager.clear();
+        Permissions.removePermissions();
     }
 
     public MainConfig getMainConfig() {

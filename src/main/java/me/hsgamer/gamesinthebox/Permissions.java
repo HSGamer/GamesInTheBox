@@ -9,13 +9,19 @@ public class Permissions {
     public static final Permission RELOAD = new Permission("gitb.reload", PermissionDefault.OP);
     public static final Permission SET_GAME = new Permission("gitb.setgame", PermissionDefault.OP);
 
-    static {
+    private Permissions() {
+        // EMPTY
+    }
+
+    public static void addPermissions() {
         Bukkit.getPluginManager().addPermission(SKIP_TIME);
         Bukkit.getPluginManager().addPermission(RELOAD);
         Bukkit.getPluginManager().addPermission(SET_GAME);
     }
 
-    private Permissions() {
-        // EMPTY
+    public static void removePermissions() {
+        Bukkit.getPluginManager().removePermission(SKIP_TIME);
+        Bukkit.getPluginManager().removePermission(RELOAD);
+        Bukkit.getPluginManager().removePermission(SET_GAME);
     }
 }
