@@ -1,6 +1,5 @@
 package me.hsgamer.gamesinthebox.util;
 
-import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.feature.CooldownFeature;
 import me.hsgamer.gamesinthebox.feature.GameFeature;
 import me.hsgamer.gamesinthebox.feature.TopFeature;
@@ -38,7 +37,7 @@ public final class ArenaUtils {
 
     public static String getCurrentGame(Arena arena) {
         return Optional.ofNullable(arena.getArenaFeature(GameFeature.class).getCurrentGame())
-                .map(ArenaGame::getDisplayName)
+                .map(arenaGame -> arenaGame.replace(arenaGame.getDisplayName()))
                 .map(MessageUtils::colorize)
                 .orElse("");
     }
