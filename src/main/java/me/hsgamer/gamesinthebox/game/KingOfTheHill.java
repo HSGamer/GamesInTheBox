@@ -180,7 +180,7 @@ public class KingOfTheHill extends ArenaGame {
     @Override
     public void clear() {
         try {
-            particleTask.get().cancel();
+            particleTask.getAndSet(null).cancel();
         } catch (Exception ignored) {
             // IGNORED
         }

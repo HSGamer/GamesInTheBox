@@ -223,6 +223,7 @@ public class BlockRush extends ArenaGame implements Listener {
                 // IGNORED
             }
         }
+        blockLocations.forEach(location -> XBlock.setType(location.getBlock(), XMaterial.AIR));
 
         HandlerList.unregisterAll(this);
         pointFeature.clear();
@@ -230,5 +231,7 @@ public class BlockRush extends ArenaGame implements Listener {
         boundingIterator.reset();
         rewardFeature.clear();
         timerFeature.clear();
+        blockLocations.clear();
+        isWorking.set(false);
     }
 }
