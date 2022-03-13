@@ -34,13 +34,12 @@ public final class GamesInTheBox extends BasePlugin {
     public void enable() {
         Permissions.addPermissions();
         arenaManager.init();
+        arenaManager.getFeature(HologramFeature.class).getHologramProvider().postInit();
         registerCommand(new AdminCommand(this));
     }
 
     @Override
     public void postEnable() {
-        arenaManager.getFeature(HologramFeature.class).getHologramProvider().postInit();
-
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             GamesInTheBox instance = this;
             PlaceholderExpansion expansion = new PlaceholderExpansion() {
