@@ -112,7 +112,6 @@ public abstract class ArenaGame implements Initializer {
         } else {
             displayName = getDefaultDisplayName();
         }
-        displayName = replace(displayName);
         return displayName;
     }
 
@@ -123,8 +122,7 @@ public abstract class ArenaGame implements Initializer {
         } else {
             description = getDefaultDescription();
         }
-        description.replaceAll(this::replace);
-        return getDefaultDescription();
+        return description;
     }
 
     public final String replace(String str) {
