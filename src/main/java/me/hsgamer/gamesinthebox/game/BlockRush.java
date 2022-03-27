@@ -58,7 +58,12 @@ public class BlockRush extends ArenaGame implements Listener {
         super(arena, name);
         rewardFeature = RewardFeature.of(this);
         boundingFeature = BoundingFeature.of(this);
-        boundingIterator = new BoundingIterator(boundingFeature.getBoundingBox(), false);
+        boundingIterator = BoundingIterator.Enums.get(
+                getString(
+                        "bounding-iterator",
+                        BoundingIterator.Enums.RANDOM_TYPE.name()
+                ))
+                .get(boundingFeature.getBoundingBox(), false);
 
         pointFeature = PointFeature.of(this);
         point = getInstance("point", 1, Number.class).intValue();
