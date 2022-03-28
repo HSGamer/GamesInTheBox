@@ -2,6 +2,7 @@ package me.hsgamer.gamesinthebox.game;
 
 import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.feature.CooldownFeature;
+import me.hsgamer.gamesinthebox.feature.game.BlockParticleFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.feature.game.PointFeature;
 import me.hsgamer.gamesinthebox.feature.game.RewardFeature;
@@ -30,6 +31,7 @@ public class FreeForAll extends ArenaGame implements Listener {
     private final BoundingFeature boundingFeature;
     private final RewardFeature rewardFeature;
     private final TimerFeature timerFeature;
+    private final BlockParticleFeature blockParticleFeature;
 
     private final int pointAdd;
     private final int pointMinus;
@@ -43,6 +45,7 @@ public class FreeForAll extends ArenaGame implements Listener {
         rewardFeature = RewardFeature.of(this);
         boundingFeature = BoundingFeature.of(this);
         pointFeature = PointFeature.of(this);
+        blockParticleFeature = BlockParticleFeature.of(this);
 
         pointAdd = getInstance("point.add", 5, Number.class).intValue();
         pointMinus = getInstance("point.minus", 1, Number.class).intValue();
@@ -117,6 +120,7 @@ public class FreeForAll extends ArenaGame implements Listener {
         timerFeature.setDuration(inGameTime, timeUnit);
         pointFeature.setTopSnapshot(true);
         instance.registerListener(this);
+        blockParticleFeature.start(boundingFeature);
     }
 
     @Override
@@ -129,6 +133,7 @@ public class FreeForAll extends ArenaGame implements Listener {
     public void onInGameOver() {
         pointFeature.setTopSnapshot(false);
         HandlerList.unregisterAll(this);
+        blockParticleFeature.stop();
     }
 
     @Override
@@ -147,6 +152,7 @@ public class FreeForAll extends ArenaGame implements Listener {
     @Override
     public void clear() {
         HandlerList.unregisterAll(this);
+        blockParticleFeature.clear();
         pointFeature.clear();
         boundingFeature.clear();
         rewardFeature.clear();

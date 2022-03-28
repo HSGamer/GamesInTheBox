@@ -1,9 +1,8 @@
 package me.hsgamer.gamesinthebox.game;
 
-import com.cryptomorin.xseries.particles.ParticleDisplay;
-import com.cryptomorin.xseries.particles.XParticle;
 import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.feature.CooldownFeature;
+import me.hsgamer.gamesinthebox.feature.game.BlockParticleFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.feature.game.PointFeature;
 import me.hsgamer.gamesinthebox.feature.game.RewardFeature;
@@ -13,15 +12,10 @@ import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import me.hsgamer.minigamecore.implementation.feature.single.TimerFeature;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.BoundingBox;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class KingOfTheHill extends ArenaGame {
@@ -29,6 +23,7 @@ public class KingOfTheHill extends ArenaGame {
     private final BoundingFeature boundingFeature;
     private final RewardFeature rewardFeature;
     private final TimerFeature timerFeature;
+    private final BlockParticleFeature blockParticleFeature;
 
     private final int pointAdd;
     private final int pointMinus;
@@ -38,16 +33,12 @@ public class KingOfTheHill extends ArenaGame {
     private final long waitingTime;
     private final long inGameTime;
 
-    private final ParticleDisplay particleDisplay;
-    private final double particleRate;
-    private final long particlePeriod;
-    private final AtomicReference<BukkitTask> particleTask = new AtomicReference<>();
-
     public KingOfTheHill(Arena arena, String name) {
         super(arena, name);
         rewardFeature = RewardFeature.of(this);
         boundingFeature = BoundingFeature.of(this);
         pointFeature = PointFeature.of(this);
+        blockParticleFeature = BlockParticleFeature.of(this);
 
         pointAdd = getInstance("point.add", 5, Number.class).intValue();
         pointMinus = getInstance("point.minus", 1, Number.class).intValue();
@@ -59,10 +50,6 @@ public class KingOfTheHill extends ArenaGame {
                 .orElse(TimeUnit.SECONDS);
         waitingTime = getInstance("time.waiting", 30L, Number.class).longValue();
         inGameTime = getInstance("time.in-game", 300L, Number.class).longValue();
-
-        particleDisplay = ParticleDisplay.fromConfig(Utils.createSection(getValues("particle", false)));
-        particleRate = getInstance("particle.rate", 0.5, Number.class).doubleValue();
-        particlePeriod = getInstance("particle.period", 0L, Number.class).longValue();
     }
 
     @Override
@@ -113,22 +100,7 @@ public class KingOfTheHill extends ArenaGame {
         Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, startMessage));
         timerFeature.setDuration(inGameTime, timeUnit);
         pointFeature.setTopSnapshot(true);
-
-        BoundingBox boundingBox = boundingFeature.getBoundingBox();
-        World world = boundingFeature.getWorld();
-        BukkitRunnable runnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                XParticle.structuredCube(
-                        boundingBox.getMin().toLocation(world),
-                        boundingBox.getMax().toLocation(world),
-                        particleRate,
-                        particleDisplay
-                );
-            }
-        };
-        BukkitTask task = runnable.runTaskTimer(instance, 0, particlePeriod);
-        particleTask.set(task);
+        blockParticleFeature.start(boundingFeature);
     }
 
     @Override
@@ -157,11 +129,7 @@ public class KingOfTheHill extends ArenaGame {
     @Override
     public void onInGameOver() {
         pointFeature.setTopSnapshot(false);
-        try {
-            particleTask.get().cancel();
-        } catch (Exception ignored) {
-            // IGNORED
-        }
+        blockParticleFeature.stop();
     }
 
     @Override
@@ -179,11 +147,7 @@ public class KingOfTheHill extends ArenaGame {
 
     @Override
     public void clear() {
-        try {
-            particleTask.getAndSet(null).cancel();
-        } catch (Exception ignored) {
-            // IGNORED
-        }
+        blockParticleFeature.clear();
         pointFeature.clear();
         boundingFeature.clear();
         rewardFeature.clear();
