@@ -3,10 +3,12 @@ package me.hsgamer.gamesinthebox.feature.stratery;
 import com.lewdev.probabilitylib.ProbabilityCollection;
 import me.hsgamer.gamesinthebox.feature.ConfigFeature;
 import me.hsgamer.gamesinthebox.feature.GameFeature;
+import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class RandomPickStrategy implements GamePickStrategy {
@@ -31,7 +33,10 @@ public class RandomPickStrategy implements GamePickStrategy {
             }
             probabilityCollection.add(key, chance);
         });
-        waitingTime = configFeature.getInstance("pick-waiting-time", waitingTime, Number.class).longValue();
+        TimeUnit timeUnit = Optional.ofNullable(configFeature.getString("pick-waiting.unit", TimeUnit.MILLISECONDS.name()))
+                .flatMap(Utils::parseTimeUnit)
+                .orElse(TimeUnit.MILLISECONDS);
+        waitingTime = timeUnit.toMillis(configFeature.getInstance("pick-waiting.time", waitingTime, Number.class).longValue());
     }
 
     @Override
