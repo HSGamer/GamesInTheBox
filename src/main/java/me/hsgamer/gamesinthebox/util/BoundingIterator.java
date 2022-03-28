@@ -26,19 +26,19 @@ public interface BoundingIterator extends Iterator<Vector> {
                 Y_COORDINATE,
                 Z_COORDINATE,
                 X_COORDINATE
-                )),
+        )),
         Y_LEAD((boundingBox, maxInclusive) -> new LinearBoundingIterator(
                 boundingBox, maxInclusive,
                 X_COORDINATE,
                 Z_COORDINATE,
                 Y_COORDINATE
-                )),
+        )),
         Z_LEAD((boundingBox, maxInclusive) -> new LinearBoundingIterator(
                 boundingBox, maxInclusive,
                 X_COORDINATE,
                 Y_COORDINATE,
                 Z_COORDINATE
-                )),
+        )),
         RANDOM_TYPE(RandomTypeBoundingIterator::new),
         RANDOM(RandomBoundingIterator::new);
 

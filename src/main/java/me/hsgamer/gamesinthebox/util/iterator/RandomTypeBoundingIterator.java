@@ -21,9 +21,9 @@ public class RandomTypeBoundingIterator implements BoundingIterator {
 
     private BoundingIterator getRandom() {
         return Objects.requireNonNull(
-                CollectionUtils.pickRandom(
-                        BoundingIterator.Enums.values(),
-                        e -> e != BoundingIterator.Enums.RANDOM_TYPE)
+                        CollectionUtils.pickRandom(
+                                BoundingIterator.Enums.values(),
+                                e -> e != BoundingIterator.Enums.RANDOM_TYPE)
                 )
                 .get(boundingBox, maxInclusive);
     }
