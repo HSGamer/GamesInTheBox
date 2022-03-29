@@ -94,6 +94,8 @@ public class HologramFeature extends ArenaFeature<HologramFeature.ArenaHologramF
 
         public void updateHolograms() {
             ArenaGame game = arena.getArenaFeature(GameFeature.class).getCurrentGame();
+            if (game == null) return;
+
             List<String> description = game.getDescription();
             List<String> topDescription = game.getTopDescription();
 
