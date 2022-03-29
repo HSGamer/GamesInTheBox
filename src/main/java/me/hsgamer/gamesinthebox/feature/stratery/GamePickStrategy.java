@@ -11,7 +11,8 @@ public interface GamePickStrategy extends Initializer {
 
     enum Enums {
         CRON(CronTimeStrategy::new),
-        RANDOM(RandomPickStrategy::new);
+        RANDOM(RandomPickStrategy::new),
+        SEQUENCE(SequencePickStrategy::new);
         private final Function<Arena, GamePickStrategy> function;
 
         Enums(Function<Arena, GamePickStrategy> function) {
