@@ -18,7 +18,7 @@ public class HDHologramProvider implements HologramProvider {
     }
 
     @Override
-    public void postInit() {
+    public void init() {
         ArenaManager arenaManager = instance.getArenaManager();
         arenaManager.getAllArenas().forEach(arena -> {
             String pluginName = instance.getName().toLowerCase(Locale.ROOT);

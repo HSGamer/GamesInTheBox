@@ -4,7 +4,6 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.hsgamer.gamesinthebox.command.AdminCommand;
 import me.hsgamer.gamesinthebox.config.MainConfig;
 import me.hsgamer.gamesinthebox.config.MessageConfig;
-import me.hsgamer.gamesinthebox.feature.HologramFeature;
 import me.hsgamer.gamesinthebox.manager.GameArenaManager;
 import me.hsgamer.gamesinthebox.util.ArenaUtils;
 import me.hsgamer.hscore.bukkit.baseplugin.BasePlugin;
@@ -33,13 +32,13 @@ public final class GamesInTheBox extends BasePlugin {
     @Override
     public void enable() {
         Permissions.addPermissions();
-        arenaManager.init();
-        arenaManager.getFeature(HologramFeature.class).getHologramProvider().postInit();
         registerCommand(new AdminCommand(this));
     }
 
     @Override
     public void postEnable() {
+        arenaManager.init();
+
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             GamesInTheBox instance = this;
             PlaceholderExpansion expansion = new PlaceholderExpansion() {
