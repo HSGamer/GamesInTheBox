@@ -2,6 +2,7 @@ package me.hsgamer.gamesinthebox.feature.game;
 
 import com.cryptomorin.xseries.particles.ParticleDisplay;
 import com.cryptomorin.xseries.particles.XParticle;
+import me.hsgamer.blockutil.extra.box.BlockBox;
 import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.minigamecore.base.Feature;
@@ -9,7 +10,7 @@ import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -20,11 +21,13 @@ public class BlockParticleFeature implements Feature {
     public final long particlePeriod;
     private final AtomicReference<BukkitTask> particleTask = new AtomicReference<>();
     private BiConsumer<BlockParticleFeature, BoundingFeature> consumer = (feature, boundingFeature) -> {
-        BoundingBox boundingBox = boundingFeature.getBoundingBox();
+        BlockBox boundingBox = boundingFeature.getBlockBox();
         World world = boundingFeature.getWorld();
+        Vector minVector = new Vector(boundingBox.minX, boundingBox.minY, boundingBox.minZ);
+        Vector maxVector = new Vector(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
         XParticle.structuredCube(
-                boundingBox.getMin().toLocation(world),
-                boundingBox.getMax().toLocation(world),
+                minVector.toLocation(world),
+                maxVector.toLocation(world),
                 feature.particleRate,
                 feature.particleDisplay
         );

@@ -1,5 +1,6 @@
 package me.hsgamer.gamesinthebox.feature.game;
 
+import me.hsgamer.blockutil.extra.box.BlockBox;
 import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.util.LocationUtils;
 import me.hsgamer.minigamecore.base.Feature;
@@ -7,17 +8,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.util.BoundingBox;
 
 import java.util.UUID;
 
 public class BoundingFeature implements Feature {
     private final World world;
-    private final BoundingBox boundingBox;
+    private final BlockBox blockBox;
 
-    public BoundingFeature(World world, BoundingBox boundingBox) {
+    public BoundingFeature(World world, BlockBox blockBox) {
         this.world = world;
-        this.boundingBox = boundingBox;
+        this.blockBox = blockBox;
     }
 
     public static BoundingFeature of(ArenaGame arenaGame, String worldPath, String pos1Path, String pos2Path) {
@@ -34,8 +34,7 @@ public class BoundingFeature implements Feature {
         if (pos2 == null) {
             throw new IllegalStateException(arenaGame.getName() + " has invalid position 2");
         }
-        BoundingBox boundingBox = BoundingBox.of(pos1.getBlock(), pos2.getBlock());
-        return new BoundingFeature(world, boundingBox);
+        return new BoundingFeature(world, new BlockBox(pos1, pos2, true));
     }
 
     public static BoundingFeature of(ArenaGame arenaGame) {
@@ -51,14 +50,19 @@ public class BoundingFeature implements Feature {
         if (location.getWorld() != world) {
             return false;
         }
-        return boundingBox.contains(location.toVector());
+        return blockBox.minX <= location.getX()
+                && blockBox.maxX >= location.getX()
+                && blockBox.minY <= location.getY()
+                && blockBox.maxY >= location.getY()
+                && blockBox.minZ <= location.getZ()
+                && blockBox.maxZ >= location.getZ();
     }
 
     public World getWorld() {
         return world;
     }
 
-    public BoundingBox getBoundingBox() {
-        return boundingBox;
+    public BlockBox getBlockBox() {
+        return blockBox;
     }
 }

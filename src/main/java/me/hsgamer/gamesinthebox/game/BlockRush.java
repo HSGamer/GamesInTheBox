@@ -4,7 +4,6 @@ import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XTag;
 import com.lewdev.probabilitylib.ProbabilityCollection;
 import me.hsgamer.blockutil.api.BlockUtil;
-import me.hsgamer.blockutil.extra.box.BlockBox;
 import me.hsgamer.blockutil.extra.iterator.BlockIteratorUtil;
 import me.hsgamer.blockutil.extra.iterator.api.BlockIterator;
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
@@ -25,7 +24,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -48,18 +46,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
     public BlockRush(Arena arena, String name) {
         super(arena, name);
         boundingFeature = BoundingFeature.of(this);
-        Vector minVector = boundingFeature.getBoundingBox().getMin();
-        Vector maxVector = boundingFeature.getBoundingBox().getMax();
-        BlockBox blockBox = new BlockBox(
-                minVector.getBlockX(),
-                minVector.getBlockY(),
-                minVector.getBlockZ(),
-                maxVector.getBlockX(),
-                maxVector.getBlockY(),
-                maxVector.getBlockZ(),
-                false
-        );
-        blockIterator = BlockIteratorUtil.get(getString("bounding-iterator", "default"), blockBox);
+        blockIterator = BlockIteratorUtil.get(getString("bounding-iterator", "default"), boundingFeature.getBlockBox());
 
         point = getInstance("point", 1, Number.class).intValue();
 
