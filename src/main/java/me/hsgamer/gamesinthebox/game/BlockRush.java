@@ -117,7 +117,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
                         if (!placeOnlyOnAir || !XTag.AIR.isTagged(XMaterial.matchXMaterial(block.getType()))) {
                             XMaterial xMaterial = materialRandomness.get();
                             Material material = Optional.ofNullable(xMaterial.parseMaterial()).orElse(Material.STONE);
-                            BlockUtil.getHandler().setBlock(block, material, xMaterial.getData(), false, false);
+                            BlockUtil.getHandler().setBlock(block, material, xMaterial.getData(), false, true);
                             blockLocations.add(block.getLocation());
                             chunks.add(block.getChunk());
                         }
