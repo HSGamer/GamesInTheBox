@@ -32,14 +32,13 @@ public final class GamesInTheBox extends BasePlugin {
     @Override
     public void enable() {
         Permissions.addPermissions();
+        arenaManager.init();
+        arenaManager.postInit();
         registerCommand(new AdminCommand(this));
     }
 
     @Override
     public void postEnable() {
-        arenaManager.init();
-        arenaManager.postInit();
-
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             GamesInTheBox instance = this;
             PlaceholderExpansion expansion = new PlaceholderExpansion() {
