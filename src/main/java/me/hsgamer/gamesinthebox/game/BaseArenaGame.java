@@ -34,6 +34,13 @@ public abstract class BaseArenaGame extends ArenaGame {
     }
 
     @Override
+    public void init() {
+        super.init();
+        pointFeature.init();
+        rewardFeature.init();
+    }
+
+    @Override
     public void clear() {
         super.clear();
         rewardFeature.clear();

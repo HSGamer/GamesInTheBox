@@ -2,6 +2,7 @@ package me.hsgamer.gamesinthebox.feature.game;
 
 import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.util.ActionBarUtils;
+import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Feature;
 import org.bukkit.Bukkit;
@@ -15,16 +16,12 @@ import java.util.stream.Collectors;
 
 public class PointFeature implements Feature {
     private final Map<UUID, Integer> points = new IdentityHashMap<>();
-    private final BukkitTask task;
     private final AtomicBoolean updateTop = new AtomicBoolean(false);
     private final AtomicReference<List<Pair<UUID, Integer>>> topSnapshot = new AtomicReference<>(Collections.emptyList());
+    private BukkitTask task = null;
     private PointConsumer pointConsumer = (uuid, point, totalPoint) -> {
         // EMPTY
     };
-
-    public PointFeature() {
-        this.task = Bukkit.getScheduler().runTaskTimerAsynchronously(JavaPlugin.getProvidingPlugin(getClass()), this::takeTopSnapshot, 20, 20);
-    }
 
     public static PointFeature of(ArenaGame arenaGame) {
         PointFeature pointFeature = new PointFeature();
@@ -37,6 +34,11 @@ public class PointFeature implements Feature {
             ActionBarUtils.sendActionBar(uuid, message);
         });
         return pointFeature;
+    }
+
+    @Override
+    public void init() {
+        this.task = Bukkit.getScheduler().runTaskTimerAsynchronously(JavaPlugin.getProvidingPlugin(getClass()), this::takeTopSnapshot, 20, 20);
     }
 
     private void takeTopSnapshot() {
@@ -114,7 +116,7 @@ public class PointFeature implements Feature {
 
     @Override
     public void clear() {
-        task.cancel();
+        Utils.cancelSafe(task);
     }
 
     public interface PointConsumer {

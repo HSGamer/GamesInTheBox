@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -122,7 +123,8 @@ public class Pinata extends BaseArenaGame implements Listener {
         Optional.ofNullable(currentPinata.getAndSet(null))
                 .filter(livingEntity -> !livingEntity.isDead())
                 .ifPresent(LivingEntity::remove);
-
+        HandlerList.unregisterAll(this);
+        boundingFeature.clear();
         super.clear();
     }
 }
