@@ -16,6 +16,7 @@
         <java.version>11</java.version>
         <core.version>4.0.2</core.version>
         <minigamecore.version>1.0-SNAPSHOT</minigamecore.version>
+        <blockutil.version>1.0.1</blockutil.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -56,6 +57,10 @@
                                 <relocation>
                                     <pattern>com.lewdev.probabilitylib</pattern>
                                     <shadedPattern>me.hsgamer.gamesinthebox.probabilitylib</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>me.hsgamer.blockutil</pattern>
+                                    <shadedPattern>me.hsgamer.gamesinthebox.blockutil</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.cryptomorin.xseries</pattern>
@@ -156,6 +161,17 @@
             <groupId>me.hsgamer</groupId>
             <artifactId>minigamecore-implementation</artifactId>
             <version>${minigamecore.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>me.hsgamer</groupId>
+            <artifactId>block-util-api</artifactId>
+            <version>${blockutil.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>me.hsgamer</groupId>
+            <artifactId>block-util-extra</artifactId>
+            <version>${blockutil.version}</version>
         </dependency>
 
         <dependency>

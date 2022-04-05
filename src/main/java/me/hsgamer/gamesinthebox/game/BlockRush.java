@@ -4,13 +4,16 @@ import com.cryptomorin.xseries.XBlock;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XTag;
 import com.lewdev.probabilitylib.ProbabilityCollection;
+import me.hsgamer.blockutil.api.BlockUtil;
+import me.hsgamer.blockutil.extra.box.BlockBox;
+import me.hsgamer.blockutil.extra.iterator.BlockIteratorUtil;
+import me.hsgamer.blockutil.extra.iterator.api.BlockIterator;
 import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.feature.CooldownFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.feature.game.PointFeature;
 import me.hsgamer.gamesinthebox.feature.game.RewardFeature;
 import me.hsgamer.gamesinthebox.state.InGameState;
-import me.hsgamer.gamesinthebox.util.BoundingIterator;
 import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.hscore.common.Pair;
@@ -18,6 +21,7 @@ import me.hsgamer.minigamecore.base.Arena;
 import me.hsgamer.minigamecore.implementation.feature.single.TimerFeature;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -26,6 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +43,7 @@ public class BlockRush extends ArenaGame implements Listener {
     private final BoundingFeature boundingFeature;
     private final RewardFeature rewardFeature;
     private final TimerFeature timerFeature;
-    private final BoundingIterator boundingIterator;
+    private final BlockIterator blockIterator;
 
     private final int point;
 
@@ -58,12 +63,18 @@ public class BlockRush extends ArenaGame implements Listener {
         super(arena, name);
         rewardFeature = RewardFeature.of(this);
         boundingFeature = BoundingFeature.of(this);
-        boundingIterator = BoundingIterator.Enums.get(
-                        getString(
-                                "bounding-iterator",
-                                BoundingIterator.Enums.RANDOM_TYPE.name()
-                        ))
-                .get(boundingFeature.getBoundingBox(), false);
+        Vector minVector = boundingFeature.getBoundingBox().getMin();
+        Vector maxVector = boundingFeature.getBoundingBox().getMax();
+        BlockBox blockBox = new BlockBox(
+                minVector.getBlockX(),
+                minVector.getBlockY(),
+                minVector.getBlockZ(),
+                maxVector.getBlockX(),
+                maxVector.getBlockY(),
+                maxVector.getBlockZ(),
+                false
+        );
+        blockIterator = BlockIteratorUtil.get(getString("bounding-iterator", "default"), blockBox);
 
         pointFeature = PointFeature.of(this);
         point = getInstance("point", 1, Number.class).intValue();
@@ -136,11 +147,12 @@ public class BlockRush extends ArenaGame implements Listener {
             @Override
             public void run() {
                 for (int i = 0; i < blocksPerTick; i++) {
-                    if (boundingIterator.hasNext()) {
-                        Block block = boundingIterator.nextLocation(boundingFeature.getWorld()).getBlock();
+                    if (blockIterator.hasNext()) {
+                        Block block = blockIterator.nextLocation(boundingFeature.getWorld()).getBlock();
                         if (!placeOnlyOnAir || !XTag.AIR.isTagged(XMaterial.matchXMaterial(block.getType()))) {
-                            XMaterial material = materialRandomness.get();
-                            XBlock.setType(block, material);
+                            XMaterial xMaterial = materialRandomness.get();
+                            Material material = Optional.ofNullable(xMaterial.parseMaterial()).orElse(Material.STONE);
+                            BlockUtil.getHandler().setBlock(block, material, xMaterial.getData(), false, false);
                             blockLocations.add(block.getLocation());
                         }
                     } else {
@@ -213,7 +225,7 @@ public class BlockRush extends ArenaGame implements Listener {
     @Override
     public void onEndingOver() {
         pointFeature.clearPoints();
-        boundingIterator.reset();
+        blockIterator.reset();
         blockLocations.clear();
         HandlerList.unregisterAll(this);
     }
@@ -233,7 +245,7 @@ public class BlockRush extends ArenaGame implements Listener {
         HandlerList.unregisterAll(this);
         pointFeature.clear();
         boundingFeature.clear();
-        boundingIterator.reset();
+        blockIterator.reset();
         rewardFeature.clear();
         timerFeature.clear();
         blockLocations.clear();
