@@ -123,11 +123,11 @@ public class BlockRush extends BaseArenaGame implements Listener {
                         }
                     } else {
                         cancel();
-                        chunks.forEach(chunk -> BlockUtil.getHandler().setChunkUpdate(chunk));
                         isWorking.lazySet(false);
                         break;
                     }
                 }
+                chunks.forEach(chunk -> BlockUtil.getHandler().setChunkUpdate(chunk));
             }
         };
         BukkitTask task = runnable.runTaskTimer(instance, 0, 0);
@@ -165,11 +165,11 @@ public class BlockRush extends BaseArenaGame implements Listener {
                         chunks.add(block.getChunk());
                     } else {
                         cancel();
-                        chunks.forEach(chunk -> BlockUtil.getHandler().setChunkUpdate(chunk));
                         isWorking.lazySet(false);
                         break;
                     }
                 }
+                chunks.forEach(chunk -> BlockUtil.getHandler().setChunkUpdate(chunk));
             }
         };
         BukkitTask task = runnable.runTaskTimer(instance, 0, 0);
