@@ -1,10 +1,12 @@
 package me.hsgamer.gamesinthebox.game;
 
+import com.cryptomorin.xseries.particles.ParticleDisplay;
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.util.LocationUtils;
 import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
+import me.hsgamer.hscore.common.CollectionUtils;
 import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,10 +26,12 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Pinata extends BaseArenaGame implements Listener {
     private final BoundingFeature boundingFeature;
+    private final ParticleDisplay particleDisplay;
 
     private final Location spawnLocation;
 
@@ -36,8 +40,9 @@ public class Pinata extends BaseArenaGame implements Listener {
 
     public Pinata(Arena arena, String name) {
         super(arena, name);
-        spawnLocation = Objects.requireNonNull(LocationUtils.getLocation(getString("spawn-location", "world,0,0,0")), "spawn-location is null");
         boundingFeature = BoundingFeature.of(this);
+        spawnLocation = Objects.requireNonNull(LocationUtils.getLocation(getString("spawn-location", "world,0,0,0")), "spawn-location is null");
+        particleDisplay = ParticleDisplay.fromConfig(Utils.createSection(getValues("particle", false)));
     }
 
     private LivingEntity spawnPinata() {
@@ -45,25 +50,23 @@ public class Pinata extends BaseArenaGame implements Listener {
         assert world != null;
         return world.spawn(spawnLocation, Sheep.class, sheep -> {
             sheep.setAdult();
-            sheep.setSheared(true);
-            sheep.setCustomName(MessageUtils.colorize(instance.getMessageConfig().getPinataNameTag()));
+            sheep.setCustomName(getRandomNameTag());
             sheep.setCustomNameVisible(true);
             Objects.requireNonNull(sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(100);
             sheep.setHealth(100);
-            sheep.setBreed(false);
-            sheep.setMaximumNoDamageTicks(5);
             sheep.setRemoveWhenFarAway(false);
-            sheep.setAI(false);
             sheep.setAgeLock(true);
-            sheep.setCollidable(true);
             sheep.setCanPickupItems(false);
-            sheep.setInvulnerable(false);
-            sheep.setSilent(false);
-            sheep.setGravity(true);
         });
     }
 
-    private BukkitRunnable createPinataTask() {
+    private String getRandomNameTag() {
+        String tag = Optional.ofNullable(CollectionUtils.pickRandom(instance.getMessageConfig().getPinataNameTag()))
+                .orElse("&cPinata");
+        return MessageUtils.colorize(tag);
+    }
+
+    private BukkitTask createPinataTask() {
         return new BukkitRunnable() {
             @Override
             public void run() {
@@ -72,9 +75,11 @@ public class Pinata extends BaseArenaGame implements Listener {
                     currentPinata.set(spawnPinata());
                 } else if (!boundingFeature.checkBounding(pinata.getLocation())) {
                     pinata.teleport(spawnLocation);
+                } else {
+                    particleDisplay.spawn(pinata.getLocation());
                 }
             }
-        };
+        }.runTaskTimer(instance, 0, 5);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -89,6 +94,7 @@ public class Pinata extends BaseArenaGame implements Listener {
                     int point = (int) Math.floor(e.getFinalDamage());
                     if (point > 0) {
                         pointFeature.applyPoint(player.getUniqueId(), point);
+                        entity.setCustomName(getRandomNameTag());
                     }
                 }
             }
@@ -113,7 +119,7 @@ public class Pinata extends BaseArenaGame implements Listener {
         Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, startMessage));
 
         currentPinata.set(spawnPinata());
-        currentTask.set(createPinataTask().runTaskTimer(instance, 0, 20));
+        currentTask.set(createPinataTask());
         instance.registerListener(this);
     }
 

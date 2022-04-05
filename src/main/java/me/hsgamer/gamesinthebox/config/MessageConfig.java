@@ -166,9 +166,9 @@ public interface MessageConfig {
         return "&eThe arena {name} was ended. Thanks!";
     }
 
-    @ConfigPath("pinata.name-tag")
-    default String getPinataNameTag() {
-        return "&c&lHIT ME!";
+    @ConfigPath(value = "pinata.name-tag", converter = StringListConverter.class)
+    default List<String> getPinataNameTag() {
+        return List.of("&c&lHIT ME!", "&c&lMORE!");
     }
     //endregion
 }
