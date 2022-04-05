@@ -7,17 +7,12 @@ import me.hsgamer.blockutil.api.BlockUtil;
 import me.hsgamer.blockutil.extra.box.BlockBox;
 import me.hsgamer.blockutil.extra.iterator.BlockIteratorUtil;
 import me.hsgamer.blockutil.extra.iterator.api.BlockIterator;
-import me.hsgamer.gamesinthebox.api.ArenaGame;
-import me.hsgamer.gamesinthebox.feature.CooldownFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
-import me.hsgamer.gamesinthebox.feature.game.PointFeature;
-import me.hsgamer.gamesinthebox.feature.game.RewardFeature;
 import me.hsgamer.gamesinthebox.state.InGameState;
 import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
-import me.hsgamer.minigamecore.implementation.feature.single.TimerFeature;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -37,21 +32,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class BlockRush extends ArenaGame implements Listener {
-    private final PointFeature pointFeature;
+public class BlockRush extends BaseArenaGame implements Listener {
     private final BoundingFeature boundingFeature;
-    private final RewardFeature rewardFeature;
-    private final TimerFeature timerFeature;
     private final BlockIterator blockIterator;
 
     private final int point;
 
     private final int blocksPerTick;
     private final boolean placeOnlyOnAir;
-
-    private final TimeUnit timeUnit;
-    private final long waitingTime;
-    private final long inGameTime;
 
     private final List<Location> blockLocations = new ArrayList<>();
     private final ProbabilityCollection<XMaterial> materialRandomness;
@@ -60,7 +48,6 @@ public class BlockRush extends ArenaGame implements Listener {
 
     public BlockRush(Arena arena, String name) {
         super(arena, name);
-        rewardFeature = RewardFeature.of(this);
         boundingFeature = BoundingFeature.of(this);
         Vector minVector = boundingFeature.getBoundingBox().getMin();
         Vector maxVector = boundingFeature.getBoundingBox().getMax();
@@ -75,18 +62,10 @@ public class BlockRush extends ArenaGame implements Listener {
         );
         blockIterator = BlockIteratorUtil.get(getString("bounding-iterator", "default"), blockBox);
 
-        pointFeature = PointFeature.of(this);
         point = getInstance("point", 1, Number.class).intValue();
 
         blocksPerTick = getInstance("blocks-per-tick", 1, Number.class).intValue();
         placeOnlyOnAir = getInstance("place-only-on-air", false, Boolean.class);
-
-        timerFeature = arena.getArenaFeature(CooldownFeature.class);
-        timeUnit = Optional.ofNullable(getInstance("time.unit", TimeUnit.SECONDS.name(), String.class))
-                .flatMap(Utils::parseTimeUnit)
-                .orElse(TimeUnit.SECONDS);
-        waitingTime = getInstance("time.waiting", 30L, Number.class).longValue();
-        inGameTime = getInstance("time.in-game", 300L, Number.class).longValue();
 
         materialRandomness = Utils.parseMaterialProbability(getValues("material", false));
         if (materialRandomness.isEmpty()) {
@@ -235,14 +214,7 @@ public class BlockRush extends ArenaGame implements Listener {
 
     @Override
     public void clear() {
-        BukkitTask task = currentTask.getAndSet(null);
-        if (task != null) {
-            try {
-                task.cancel();
-            } catch (Exception ignored) {
-                // IGNORED
-            }
-        }
+        Utils.cancelSafe(currentTask.getAndSet(null));
         HashSet<Chunk> chunks = new HashSet<>();
         blockLocations.forEach(location -> {
             Block block = location.getBlock();
@@ -252,12 +224,10 @@ public class BlockRush extends ArenaGame implements Listener {
         chunks.forEach(chunk -> BlockUtil.getHandler().setChunkUpdate(chunk));
 
         HandlerList.unregisterAll(this);
-        pointFeature.clear();
         boundingFeature.clear();
         blockIterator.reset();
-        rewardFeature.clear();
-        timerFeature.clear();
         blockLocations.clear();
         isWorking.set(false);
+        super.clear();
     }
 }

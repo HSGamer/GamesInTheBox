@@ -6,9 +6,11 @@ import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import me.hsgamer.minigamecore.base.ArenaFeature;
 import me.hsgamer.minigamecore.base.Feature;
+import org.bukkit.Bukkit;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 
 public class GameFeature extends ArenaFeature<GameFeature.ArenaGameFeature> {
 
@@ -45,10 +47,14 @@ public class GameFeature extends ArenaFeature<GameFeature.ArenaGameFeature> {
                     return;
                 }
                 String type = Objects.toString(map.get("type"));
-                ArenaGameBuilder.INSTANCE.build(type, Pair.of(arena, key)).ifPresent(game -> {
-                    game.init();
-                    games.put(key, game);
-                });
+                try {
+                    ArenaGameBuilder.INSTANCE.build(type, Pair.of(arena, key)).ifPresent(game -> {
+                        game.init();
+                        games.put(key, game);
+                    });
+                } catch (Exception e) {
+                    Bukkit.getLogger().log(Level.WARNING, e, () -> "Failed to load game " + key + " in arena " + arena.getName());
+                }
             });
         }
 

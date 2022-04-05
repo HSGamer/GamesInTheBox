@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.lewdev.probabilitylib.ProbabilityCollection;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Locale;
 import java.util.Map;
@@ -44,5 +45,15 @@ public final class Utils {
             collection.add(optionalXMaterial.get(), probability);
         });
         return collection;
+    }
+
+    public static void cancelSafe(BukkitTask task) {
+        if (task != null) {
+            try {
+                task.cancel();
+            } catch (Exception ignored) {
+                // IGNORED
+            }
+        }
     }
 }

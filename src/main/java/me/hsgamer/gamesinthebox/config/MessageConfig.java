@@ -165,5 +165,10 @@ public interface MessageConfig {
     default String getPinataEndBroadcast() {
         return "&eThe arena {name} was ended. Thanks!";
     }
+
+    @ConfigPath("pinata.name-tag")
+    default String getPinataNameTag() {
+        return "&c&lHIT ME!";
+    }
     //endregion
 }
