@@ -4,6 +4,7 @@ import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.game.BlockRush;
 import me.hsgamer.gamesinthebox.game.FreeForAll;
 import me.hsgamer.gamesinthebox.game.KingOfTheHill;
+import me.hsgamer.gamesinthebox.game.Pinata;
 import me.hsgamer.hscore.builder.Builder;
 import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
@@ -17,6 +18,7 @@ public class ArenaGameBuilder extends Builder<Pair<Arena, String>, ArenaGame> {
         registerSimple(KingOfTheHill::new, "king_of_the_hill", "koth");
         registerSimple(FreeForAll::new, "free_for_all", "ffa");
         registerSimple(BlockRush::new, "block_rush", "rush");
+        registerSimple(Pinata::new, "pinata", "pin");
     }
 
     public void registerSimple(BiFunction<Arena, String, ArenaGame> function, String type, String... aliases) {

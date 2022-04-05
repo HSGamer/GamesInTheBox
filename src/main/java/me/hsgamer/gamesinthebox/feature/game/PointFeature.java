@@ -54,6 +54,13 @@ public class PointFeature implements Feature {
         return topSnapshot.get();
     }
 
+    public List<Pair<UUID, String>> getTopSnapshotAsStringPair() {
+        return getTopSnapshot()
+                .stream()
+                .map(point -> Pair.of(point.getKey(), Integer.toString(point.getValue())))
+                .collect(Collectors.toList());
+    }
+
     public void setTopSnapshot(boolean enable) {
         updateTop.lazySet(enable);
     }

@@ -144,4 +144,26 @@ public interface MessageConfig {
         return "&eThe arena {name} was ended. Thanks!";
     }
     //endregion
+
+    //region PINATA
+    @ConfigPath("pinata.name")
+    default String getPinataDisplayName() {
+        return "&cPinata";
+    }
+
+    @ConfigPath(value = "pinata.description", converter = StringListConverter.class)
+    default List<String> getPinataDescription() {
+        return List.of("&7A game where you have to hit the pinata");
+    }
+
+    @ConfigPath("pinata.start-broadcast")
+    default String getPinataStartBroadcast() {
+        return "&aThe arena {name} was started. Hit the pinata!";
+    }
+
+    @ConfigPath("pinata.end-broadcast")
+    default String getPinataEndBroadcast() {
+        return "&eThe arena {name} was ended. Thanks!";
+    }
+    //endregion
 }

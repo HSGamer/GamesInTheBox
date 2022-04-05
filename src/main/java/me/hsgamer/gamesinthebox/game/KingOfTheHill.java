@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class KingOfTheHill extends ArenaGame {
     private final PointFeature pointFeature;
@@ -73,10 +72,7 @@ public class KingOfTheHill extends ArenaGame {
 
     @Override
     public List<Pair<UUID, String>> getTopList() {
-        return pointFeature.getTopSnapshot()
-                .stream()
-                .map(point -> Pair.of(point.getKey(), Integer.toString(point.getValue())))
-                .collect(Collectors.toList());
+        return pointFeature.getTopSnapshotAsStringPair();
     }
 
     @Override

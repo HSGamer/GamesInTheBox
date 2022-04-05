@@ -36,7 +36,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 public class BlockRush extends ArenaGame implements Listener {
     private final PointFeature pointFeature;
@@ -112,10 +111,7 @@ public class BlockRush extends ArenaGame implements Listener {
 
     @Override
     public List<Pair<UUID, String>> getTopList() {
-        return pointFeature.getTopSnapshot()
-                .stream()
-                .map(pair -> Pair.of(pair.getKey(), Integer.toString(pair.getValue())))
-                .collect(Collectors.toList());
+        return pointFeature.getTopSnapshotAsStringPair();
     }
 
     @Override

@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class FreeForAll extends ArenaGame implements Listener {
     private final PointFeature pointFeature;
@@ -78,10 +77,7 @@ public class FreeForAll extends ArenaGame implements Listener {
 
     @Override
     public List<Pair<UUID, String>> getTopList() {
-        return pointFeature.getTopSnapshot()
-                .stream()
-                .map(point -> Pair.of(point.getKey(), Integer.toString(point.getValue())))
-                .collect(Collectors.toList());
+        return pointFeature.getTopSnapshotAsStringPair();
     }
 
     @Override
