@@ -45,6 +45,12 @@ public class HologramFeature extends ArenaFeature<HologramFeature.ArenaHologramF
         hologramProvider.clear();
     }
 
+    @Override
+    public void postInit() {
+        super.postInit();
+        hologramProvider.postInit();
+    }
+
     public HologramProvider getHologramProvider() {
         return hologramProvider;
     }

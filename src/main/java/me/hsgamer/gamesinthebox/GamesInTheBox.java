@@ -38,6 +38,7 @@ public final class GamesInTheBox extends BasePlugin {
     @Override
     public void postEnable() {
         arenaManager.init();
+        arenaManager.postInit();
 
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             GamesInTheBox instance = this;
