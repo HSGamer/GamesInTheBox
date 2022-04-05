@@ -151,7 +151,6 @@ public class BlockRush extends BaseArenaGame implements Listener {
         super.onEndingStart();
         String endMessage = instance.getMessageConfig().getRushEndBroadcast().replace("{name}", arena.getName());
         Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
-        rewardFeature.tryReward(pointFeature.getTopUUID());
 
         Iterator<Location> iterator = blockLocations.iterator();
         isWorking.set(true);

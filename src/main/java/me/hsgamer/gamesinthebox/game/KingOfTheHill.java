@@ -89,10 +89,9 @@ public class KingOfTheHill extends BaseArenaGame {
 
     @Override
     public void onEndingStart() {
+        super.onEndingStart();
         String endMessage = instance.getMessageConfig().getKOTHEndBroadcast().replace("{name}", arena.getName());
         Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
-
-        rewardFeature.tryReward(pointFeature.getTopUUID());
     }
 
     @Override

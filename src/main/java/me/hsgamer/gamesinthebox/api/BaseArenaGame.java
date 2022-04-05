@@ -87,6 +87,11 @@ public abstract class BaseArenaGame extends ArenaGame {
     }
 
     @Override
+    public void onEndingStart() {
+        rewardFeature.tryReward(pointFeature.getTopUUID());
+    }
+
+    @Override
     public void onEndingOver() {
         pointFeature.clearPoints();
     }

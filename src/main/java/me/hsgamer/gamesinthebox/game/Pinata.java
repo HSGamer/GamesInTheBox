@@ -6,6 +6,7 @@ import me.hsgamer.gamesinthebox.util.LocationUtils;
 import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.minigamecore.base.Arena;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -23,7 +24,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Pinata extends BaseArenaGame implements Listener {
@@ -107,11 +107,35 @@ public class Pinata extends BaseArenaGame implements Listener {
     }
 
     @Override
+    public void onInGameStart() {
+        super.onInGameStart();
+        String startMessage = instance.getMessageConfig().getPinataStartBroadcast().replace("{name}", arena.getName());
+        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, startMessage));
+
+        currentPinata.set(spawnPinata());
+        currentTask.set(createPinataTask().runTaskTimer(instance, 0, 20));
+        instance.registerListener(this);
+    }
+
+    @Override
+    public void onInGameOver() {
+        super.onInGameOver();
+        HandlerList.unregisterAll(this);
+        Utils.cancelSafe(currentTask.getAndSet(null));
+        Utils.despawnSafe(currentPinata.getAndSet(null));
+    }
+
+    @Override
+    public void onEndingStart() {
+        super.onEndingStart();
+        String endMessage = instance.getMessageConfig().getKOTHEndBroadcast().replace("{name}", arena.getName());
+        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
+    }
+
+    @Override
     public void clear() {
         Utils.cancelSafe(currentTask.getAndSet(null));
-        Optional.ofNullable(currentPinata.getAndSet(null))
-                .filter(livingEntity -> !livingEntity.isDead())
-                .ifPresent(LivingEntity::remove);
+        Utils.despawnSafe(currentPinata.getAndSet(null));
         HandlerList.unregisterAll(this);
         boundingFeature.clear();
         super.clear();

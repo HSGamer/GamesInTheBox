@@ -4,6 +4,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.lewdev.probabilitylib.ProbabilityCollection;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Locale;
@@ -51,6 +52,16 @@ public final class Utils {
         if (task != null) {
             try {
                 task.cancel();
+            } catch (Exception ignored) {
+                // IGNORED
+            }
+        }
+    }
+
+    public static void despawnSafe(Entity entity) {
+        if (entity != null && entity.isValid()) {
+            try {
+                entity.remove();
             } catch (Exception ignored) {
                 // IGNORED
             }

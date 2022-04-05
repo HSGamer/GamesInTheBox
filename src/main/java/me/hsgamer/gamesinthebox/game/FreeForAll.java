@@ -82,10 +82,9 @@ public class FreeForAll extends BaseArenaGame implements Listener {
 
     @Override
     public void onEndingStart() {
+        super.onEndingStart();
         String endMessage = instance.getMessageConfig().getFFAEndBroadcast().replace("{name}", arena.getName());
         Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
-
-        rewardFeature.tryReward(pointFeature.getTopUUID());
     }
 
     @Override
