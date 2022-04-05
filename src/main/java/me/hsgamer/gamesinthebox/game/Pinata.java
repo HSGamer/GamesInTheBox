@@ -38,11 +38,16 @@ public class Pinata extends BaseArenaGame implements Listener {
     private final AtomicReference<LivingEntity> currentPinata = new AtomicReference<>();
     private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
 
+    private final double pinataSpeed;
+    private final int maxNoDamageTicks;
+
     public Pinata(Arena arena, String name) {
         super(arena, name);
         boundingFeature = BoundingFeature.of(this);
         spawnLocation = Objects.requireNonNull(LocationUtils.getLocation(getString("spawn-location", "world,0,0,0")), "spawn-location is null");
         particleDisplay = ParticleDisplay.fromConfig(Utils.createSection(getValues("particle", false)));
+        pinataSpeed = getInstance("pinata.speed", 0.23, Number.class).doubleValue();
+        maxNoDamageTicks = getInstance("pinata.max-no-damage-ticks", 20, Number.class).intValue();
     }
 
     private LivingEntity spawnPinata() {
@@ -53,6 +58,8 @@ public class Pinata extends BaseArenaGame implements Listener {
             sheep.setCustomName(getRandomNameTag());
             sheep.setCustomNameVisible(true);
             Objects.requireNonNull(sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(100);
+            Objects.requireNonNull(sheep.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(pinataSpeed);
+            sheep.setMaximumNoDamageTicks(maxNoDamageTicks);
             sheep.setHealth(100);
             sheep.setRemoveWhenFarAway(false);
             sheep.setAgeLock(true);
