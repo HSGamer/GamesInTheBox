@@ -5,10 +5,13 @@ import me.hsgamer.gamesinthebox.feature.CooldownFeature;
 import me.hsgamer.gamesinthebox.feature.game.PointFeature;
 import me.hsgamer.gamesinthebox.feature.game.RewardFeature;
 import me.hsgamer.gamesinthebox.util.Utils;
+import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import me.hsgamer.minigamecore.implementation.feature.single.TimerFeature;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public abstract class BaseArenaGame extends ArenaGame {
@@ -34,6 +37,16 @@ public abstract class BaseArenaGame extends ArenaGame {
     }
 
     @Override
+    public List<Pair<UUID, String>> getTopList() {
+        return pointFeature.getTopSnapshotAsStringPair();
+    }
+
+    @Override
+    public String getValue(UUID uuid) {
+        return Integer.toString(pointFeature.getPoint(uuid));
+    }
+
+    @Override
     public void init() {
         super.init();
         pointFeature.init();
@@ -45,5 +58,37 @@ public abstract class BaseArenaGame extends ArenaGame {
         super.clear();
         rewardFeature.clear();
         pointFeature.clear();
+    }
+
+    @Override
+    public void onWaitingStart() {
+        timerFeature.setDuration(waitingTime, timeUnit);
+    }
+
+    @Override
+    public boolean isWaitingOver() {
+        return timerFeature.getDuration(TimeUnit.MILLISECONDS) <= 0;
+    }
+
+    @Override
+    public void onInGameStart() {
+        timerFeature.setDuration(inGameTime, timeUnit);
+        pointFeature.setTopSnapshot(true);
+    }
+
+    @Override
+    public boolean isInGameOver() {
+        pointFeature.resetPointIfNotOnline();
+        return timerFeature.getDuration(TimeUnit.MILLISECONDS) <= 0;
+    }
+
+    @Override
+    public void onInGameOver() {
+        pointFeature.setTopSnapshot(false);
+    }
+
+    @Override
+    public void onEndingOver() {
+        pointFeature.clearPoints();
     }
 }

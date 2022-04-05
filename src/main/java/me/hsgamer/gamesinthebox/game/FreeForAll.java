@@ -3,7 +3,6 @@ package me.hsgamer.gamesinthebox.game;
 import me.hsgamer.gamesinthebox.feature.game.BlockParticleFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
-import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,8 +14,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class FreeForAll extends BaseArenaGame implements Listener {
     private final BoundingFeature boundingFeature;
@@ -52,16 +49,6 @@ public class FreeForAll extends BaseArenaGame implements Listener {
         );
     }
 
-    @Override
-    public List<Pair<UUID, String>> getTopList() {
-        return pointFeature.getTopSnapshotAsStringPair();
-    }
-
-    @Override
-    public String getValue(UUID uuid) {
-        return Integer.toString(pointFeature.getPoint(uuid));
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
@@ -77,34 +64,17 @@ public class FreeForAll extends BaseArenaGame implements Listener {
     }
 
     @Override
-    public void onWaitingStart() {
-        timerFeature.setDuration(waitingTime, timeUnit);
-    }
-
-    @Override
-    public boolean isWaitingOver() {
-        return timerFeature.getDuration(TimeUnit.MILLISECONDS) <= 0;
-    }
-
-    @Override
     public void onInGameStart() {
+        super.onInGameStart();
         String startMessage = instance.getMessageConfig().getFFAStartBroadcast().replace("{name}", arena.getName());
         Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, startMessage));
-        timerFeature.setDuration(inGameTime, timeUnit);
-        pointFeature.setTopSnapshot(true);
         instance.registerListener(this);
         blockParticleFeature.start(boundingFeature);
     }
 
     @Override
-    public boolean isInGameOver() {
-        pointFeature.resetPointIfNotOnline();
-        return timerFeature.getDuration(TimeUnit.MILLISECONDS) <= 0;
-    }
-
-    @Override
     public void onInGameOver() {
-        pointFeature.setTopSnapshot(false);
+        super.onInGameOver();
         HandlerList.unregisterAll(this);
         blockParticleFeature.stop();
     }
@@ -115,11 +85,6 @@ public class FreeForAll extends BaseArenaGame implements Listener {
         Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
 
         rewardFeature.tryReward(pointFeature.getTopUUID());
-    }
-
-    @Override
-    public void onEndingOver() {
-        pointFeature.clearPoints();
     }
 
     @Override

@@ -11,7 +11,6 @@ import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.state.InGameState;
 import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
-import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -28,7 +27,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -88,16 +86,6 @@ public class BlockRush extends BaseArenaGame implements Listener {
         return Map.of("point", point);
     }
 
-    @Override
-    public List<Pair<UUID, String>> getTopList() {
-        return pointFeature.getTopSnapshotAsStringPair();
-    }
-
-    @Override
-    public String getValue(UUID uuid) {
-        return Integer.toString(pointFeature.getPoint(uuid));
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
@@ -114,7 +102,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
 
     @Override
     public void onWaitingStart() {
-        timerFeature.setDuration(waitingTime, timeUnit);
+        super.onWaitingStart();
         instance.registerListener(this);
         isWorking.set(true);
 
@@ -147,30 +135,19 @@ public class BlockRush extends BaseArenaGame implements Listener {
 
     @Override
     public boolean isWaitingOver() {
-        return timerFeature.getDuration(TimeUnit.MILLISECONDS) <= 0 && !isWorking.get();
+        return super.isWaitingOver() && !isWorking.get();
     }
 
     @Override
     public void onInGameStart() {
+        super.onInGameStart();
         String startMessage = instance.getMessageConfig().getRushStartBroadcast().replace("{name}", arena.getName());
         Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, startMessage));
-        timerFeature.setDuration(inGameTime, timeUnit);
-        pointFeature.setTopSnapshot(true);
-    }
-
-    @Override
-    public boolean isInGameOver() {
-        pointFeature.resetPointIfNotOnline();
-        return timerFeature.getDuration(TimeUnit.MILLISECONDS) <= 0;
-    }
-
-    @Override
-    public void onInGameOver() {
-        pointFeature.setTopSnapshot(false);
     }
 
     @Override
     public void onEndingStart() {
+        super.onEndingStart();
         String endMessage = instance.getMessageConfig().getRushEndBroadcast().replace("{name}", arena.getName());
         Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
         rewardFeature.tryReward(pointFeature.getTopUUID());
@@ -206,7 +183,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
 
     @Override
     public void onEndingOver() {
-        pointFeature.clearPoints();
+        super.onEndingOver();
         blockIterator.reset();
         blockLocations.clear();
         HandlerList.unregisterAll(this);

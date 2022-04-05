@@ -4,7 +4,6 @@ import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.util.LocationUtils;
 import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
-import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -24,7 +23,6 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Pinata extends BaseArenaGame implements Listener {
@@ -105,16 +103,6 @@ public class Pinata extends BaseArenaGame implements Listener {
     @Override
     public List<String> getDefaultDescription() {
         return instance.getMessageConfig().getPinataDescription();
-    }
-
-    @Override
-    public List<Pair<UUID, String>> getTopList() {
-        return pointFeature.getTopSnapshotAsStringPair();
-    }
-
-    @Override
-    public String getValue(UUID uuid) {
-        return Integer.toString(pointFeature.getPoint(uuid));
     }
 
     @Override

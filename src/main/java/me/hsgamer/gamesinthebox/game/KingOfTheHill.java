@@ -3,7 +3,6 @@ package me.hsgamer.gamesinthebox.game;
 import me.hsgamer.gamesinthebox.feature.game.BlockParticleFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
-import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class KingOfTheHill extends BaseArenaGame {
     private final BoundingFeature boundingFeature;
@@ -52,37 +50,16 @@ public class KingOfTheHill extends BaseArenaGame {
     }
 
     @Override
-    public List<Pair<UUID, String>> getTopList() {
-        return pointFeature.getTopSnapshotAsStringPair();
-    }
-
-    @Override
-    public String getValue(UUID uuid) {
-        return Integer.toString(pointFeature.getPoint(uuid));
-    }
-
-    @Override
-    public void onWaitingStart() {
-        timerFeature.setDuration(waitingTime, timeUnit);
-    }
-
-    @Override
-    public boolean isWaitingOver() {
-        return timerFeature.getDuration(TimeUnit.MILLISECONDS) <= 0;
-    }
-
-    @Override
     public void onInGameStart() {
+        super.onInGameStart();
         String startMessage = instance.getMessageConfig().getKOTHStartBroadcast().replace("{name}", arena.getName());
         Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, startMessage));
-        timerFeature.setDuration(inGameTime, timeUnit);
-        pointFeature.setTopSnapshot(true);
         blockParticleFeature.start(boundingFeature);
     }
 
     @Override
     public boolean isInGameOver() {
-        if (timerFeature.getDuration(TimeUnit.MILLISECONDS) > 0) {
+        if (!super.isInGameOver()) {
             pointFeature.resetPointIfNotOnline();
             List<UUID> playersToAdd = new ArrayList<>();
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -105,7 +82,7 @@ public class KingOfTheHill extends BaseArenaGame {
 
     @Override
     public void onInGameOver() {
-        pointFeature.setTopSnapshot(false);
+        super.onInGameOver();
         blockParticleFeature.stop();
     }
 
@@ -115,11 +92,6 @@ public class KingOfTheHill extends BaseArenaGame {
         Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
 
         rewardFeature.tryReward(pointFeature.getTopUUID());
-    }
-
-    @Override
-    public void onEndingOver() {
-        pointFeature.clearPoints();
     }
 
     @Override
