@@ -1,5 +1,6 @@
 package me.hsgamer.gamesinthebox.game;
 
+import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.feature.game.BlockParticleFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;

@@ -7,6 +7,7 @@ import me.hsgamer.blockutil.api.BlockUtil;
 import me.hsgamer.blockutil.extra.box.BlockBox;
 import me.hsgamer.blockutil.extra.iterator.BlockIteratorUtil;
 import me.hsgamer.blockutil.extra.iterator.api.BlockIterator;
+import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.state.InGameState;
 import me.hsgamer.gamesinthebox.util.Utils;

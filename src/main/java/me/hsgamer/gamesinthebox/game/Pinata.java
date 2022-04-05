@@ -1,5 +1,6 @@
 package me.hsgamer.gamesinthebox.game;
 
+import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.util.LocationUtils;
 import me.hsgamer.gamesinthebox.util.Utils;

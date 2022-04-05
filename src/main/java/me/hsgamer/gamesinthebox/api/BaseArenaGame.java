@@ -1,6 +1,5 @@
-package me.hsgamer.gamesinthebox.game;
+package me.hsgamer.gamesinthebox.api;
 
-import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.feature.CooldownFeature;
 import me.hsgamer.gamesinthebox.feature.game.PointFeature;
 import me.hsgamer.gamesinthebox.feature.game.RewardFeature;
