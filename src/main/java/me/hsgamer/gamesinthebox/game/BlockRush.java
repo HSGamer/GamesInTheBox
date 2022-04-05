@@ -1,6 +1,5 @@
 package me.hsgamer.gamesinthebox.game;
 
-import com.cryptomorin.xseries.XBlock;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XTag;
 import com.lewdev.probabilitylib.ProbabilityCollection;
@@ -20,6 +19,7 @@ import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import me.hsgamer.minigamecore.implementation.feature.single.TimerFeature;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -143,6 +143,7 @@ public class BlockRush extends ArenaGame implements Listener {
         instance.registerListener(this);
         isWorking.set(true);
 
+        HashSet<Chunk> chunks = new HashSet<>();
         BukkitRunnable runnable = new BukkitRunnable() {
             @Override
             public void run() {
@@ -154,9 +155,11 @@ public class BlockRush extends ArenaGame implements Listener {
                             Material material = Optional.ofNullable(xMaterial.parseMaterial()).orElse(Material.STONE);
                             BlockUtil.getHandler().setBlock(block, material, xMaterial.getData(), false, false);
                             blockLocations.add(block.getLocation());
+                            chunks.add(block.getChunk());
                         }
                     } else {
                         cancel();
+                        chunks.forEach(chunk -> BlockUtil.getHandler().setChunkUpdate(chunk));
                         isWorking.lazySet(false);
                         break;
                     }
@@ -199,14 +202,18 @@ public class BlockRush extends ArenaGame implements Listener {
 
         Iterator<Location> iterator = blockLocations.iterator();
         isWorking.set(true);
+        HashSet<Chunk> chunks = new HashSet<>();
         BukkitRunnable runnable = new BukkitRunnable() {
             @Override
             public void run() {
                 for (int i = 0; i < blocksPerTick; i++) {
                     if (iterator.hasNext()) {
-                        XBlock.setType(iterator.next().getBlock(), XMaterial.AIR);
+                        Block block = iterator.next().getBlock();
+                        BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, false);
+                        chunks.add(block.getChunk());
                     } else {
                         cancel();
+                        chunks.forEach(chunk -> BlockUtil.getHandler().setChunkUpdate(chunk));
                         isWorking.lazySet(false);
                         break;
                     }
@@ -240,7 +247,13 @@ public class BlockRush extends ArenaGame implements Listener {
                 // IGNORED
             }
         }
-        blockLocations.forEach(location -> XBlock.setType(location.getBlock(), XMaterial.AIR));
+        HashSet<Chunk> chunks = new HashSet<>();
+        blockLocations.forEach(location -> {
+            Block block = location.getBlock();
+            BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, false);
+            chunks.add(block.getChunk());
+        });
+        chunks.forEach(chunk -> BlockUtil.getHandler().setChunkUpdate(chunk));
 
         HandlerList.unregisterAll(this);
         pointFeature.clear();
