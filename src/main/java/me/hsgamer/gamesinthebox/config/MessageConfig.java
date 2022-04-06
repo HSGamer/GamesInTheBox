@@ -198,4 +198,26 @@ public interface MessageConfig {
         return List.of("&c&lSHOOT ME!", "&c&lMORE!");
     }
     //endregion
+
+    //region Hit the block
+    @ConfigPath("hit-the-block.name")
+    default String getHitTheBlockDisplayName() {
+        return "&cHit the Block";
+    }
+
+    @ConfigPath(value = "hit-the-block.description", converter = StringListConverter.class)
+    default List<String> getHitTheBlockDescription() {
+        return List.of("&7A game where you have to hit the block");
+    }
+
+    @ConfigPath("hit-the-block.start-broadcast")
+    default String getHitTheBlockStartBroadcast() {
+        return "&aThe arena {name} was started. Hit the block!";
+    }
+
+    @ConfigPath("hit-the-block.end-broadcast")
+    default String getHitTheBlockEndBroadcast() {
+        return "&eThe arena {name} was ended. Thanks!";
+    }
+    //endregion
 }

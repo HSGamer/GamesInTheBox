@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class BoundingFeature implements Feature {
     private final World world;
@@ -58,11 +59,57 @@ public class BoundingFeature implements Feature {
                 && blockBox.maxZ >= location.getZ();
     }
 
+    public Location getRandomLocation(VectorOffsetSetting vectorOffsetSetting) {
+        int minX = blockBox.minX + vectorOffsetSetting.minXOffset;
+        int maxX = blockBox.maxX - vectorOffsetSetting.maxXOffset;
+        int minY = blockBox.minY + vectorOffsetSetting.minYOffset;
+        int maxY = blockBox.maxY - vectorOffsetSetting.maxYOffset;
+        int minZ = blockBox.minZ + vectorOffsetSetting.minZOffset;
+        int maxZ = blockBox.maxZ - vectorOffsetSetting.maxZOffset;
+        int x = ThreadLocalRandom.current().nextInt(minX, maxX + 1);
+        int y = ThreadLocalRandom.current().nextInt(minY, maxY + 1);
+        int z = ThreadLocalRandom.current().nextInt(minZ, maxZ + 1);
+        return new Location(world, x, y, z);
+    }
+
     public World getWorld() {
         return world;
     }
 
     public BlockBox getBlockBox() {
         return blockBox;
+    }
+
+    public static class VectorOffsetSetting {
+        public final int minXOffset;
+        public final int maxXOffset;
+        public final int minYOffset;
+        public final int maxYOffset;
+        public final int minZOffset;
+        public final int maxZOffset;
+
+        public VectorOffsetSetting(int minXOffset, int maxXOffset, int minYOffset, int maxYOffset, int minZOffset, int maxZOffset) {
+            this.minXOffset = minXOffset;
+            this.maxXOffset = maxXOffset;
+            this.minYOffset = minYOffset;
+            this.maxYOffset = maxYOffset;
+            this.minZOffset = minZOffset;
+            this.maxZOffset = maxZOffset;
+        }
+
+        public VectorOffsetSetting() {
+            this(0, 0, 0, 0, 0, 0);
+        }
+
+        public static VectorOffsetSetting of(ArenaGame arenaGame, String path) {
+            return new VectorOffsetSetting(
+                    arenaGame.getInstance(path + ".min-x", 0, Number.class).intValue(),
+                    arenaGame.getInstance(path + ".max-x", 0, Number.class).intValue(),
+                    arenaGame.getInstance(path + ".min-y", 0, Number.class).intValue(),
+                    arenaGame.getInstance(path + ".max-y", 0, Number.class).intValue(),
+                    arenaGame.getInstance(path + ".min-z", 0, Number.class).intValue(),
+                    arenaGame.getInstance(path + ".max-z", 0, Number.class).intValue()
+            );
+        }
     }
 }

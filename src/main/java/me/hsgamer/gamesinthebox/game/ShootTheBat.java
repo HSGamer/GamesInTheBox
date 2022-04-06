@@ -1,6 +1,5 @@
 package me.hsgamer.gamesinthebox.game;
 
-import me.hsgamer.blockutil.extra.box.BlockBox;
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.util.Utils;
@@ -22,19 +21,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ShootTheBat extends BaseArenaGame implements Listener {
     private final BoundingFeature boundingFeature;
 
+    private final BoundingFeature.VectorOffsetSetting vectorOffsetSetting;
     private final int point;
-    private final int spawnOffsetMinX;
-    private final int spawnOffsetMaxX;
-    private final int spawnOffsetMinY;
-    private final int spawnOffsetMaxY;
-    private final int spawnOffsetMinZ;
-    private final int spawnOffsetMaxZ;
     private final int maxSpawn;
 
     private final Queue<LivingEntity> spawnedBats = new LinkedList<>();
@@ -43,35 +36,13 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
     public ShootTheBat(Arena arena, String name) {
         super(arena, name);
         boundingFeature = BoundingFeature.of(this, true);
+        vectorOffsetSetting = BoundingFeature.VectorOffsetSetting.of(this, "spawn-offset");
         point = getInstance("point", 1, Number.class).intValue();
-        spawnOffsetMinX = getInstance("spawn-offset.min-x", 0, Number.class).intValue();
-        spawnOffsetMaxX = getInstance("spawn-offset.max-x", 0, Number.class).intValue();
-        spawnOffsetMinY = getInstance("spawn-offset.min-y", 0, Number.class).intValue();
-        spawnOffsetMaxY = getInstance("spawn-offset.max-y", 0, Number.class).intValue();
-        spawnOffsetMinZ = getInstance("spawn-offset.min-z", 0, Number.class).intValue();
-        spawnOffsetMaxZ = getInstance("spawn-offset.max-z", 0, Number.class).intValue();
         maxSpawn = getInstance("max-spawn", 10, Number.class).intValue();
     }
 
-    private Location getRandomLocation() {
-        BlockBox box = boundingFeature.getBlockBox();
-        World world = boundingFeature.getWorld();
-        int minX = box.minX + spawnOffsetMinX;
-        int maxX = box.maxX - spawnOffsetMaxX;
-        int minY = box.minY + spawnOffsetMinY;
-        int maxY = box.maxY - spawnOffsetMaxY;
-        int minZ = box.minZ + spawnOffsetMinZ;
-        int maxZ = box.maxZ - spawnOffsetMaxZ;
-
-        int x = ThreadLocalRandom.current().nextInt(minX, maxX + 1);
-        int y = ThreadLocalRandom.current().nextInt(minY, maxY + 1);
-        int z = ThreadLocalRandom.current().nextInt(minZ, maxZ + 1);
-
-        return new Location(world, x, y, z);
-    }
-
     private LivingEntity spawnBat() {
-        Location location = getRandomLocation();
+        Location location = boundingFeature.getRandomLocation(vectorOffsetSetting);
         World world = location.getWorld();
         assert world != null;
         return world.spawn(location, Bat.class, bat -> {
