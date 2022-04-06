@@ -9,6 +9,7 @@ import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -58,10 +59,11 @@ public class Pinata extends BaseArenaGame implements Listener {
         pinata.setCustomNameVisible(true);
         pinata.setRemoveWhenFarAway(false);
         pinata.setCanPickupItems(false);
-        Objects.requireNonNull(pinata.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(100);
-        pinata.setHealth(100);
         if (pinataSpeed >= 0) {
-            Objects.requireNonNull(pinata.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(pinataSpeed);
+            AttributeInstance attributeInstance = pinata.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+            if (attributeInstance != null) {
+                attributeInstance.setBaseValue(pinataSpeed);
+            }
         }
         if (maxNoDamageTicks >= 0) {
             pinata.setMaximumNoDamageTicks(maxNoDamageTicks);
