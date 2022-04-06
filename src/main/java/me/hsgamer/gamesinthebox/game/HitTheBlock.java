@@ -6,6 +6,7 @@ import me.hsgamer.blockutil.api.BlockUtil;
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.util.Utils;
+import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -34,8 +35,9 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
     private final ProbabilityCollection<XMaterial> materialRandomness;
     private final Map<XMaterial, Integer> materialScoreMap;
     private final int defaultPoint;
+    private final boolean removeProjectileOnHit;
 
-    private final List<Location> spawnBlocks = new ArrayList<>();
+    private final Map<Location, Integer> spawnBlocks = new HashMap<>();
     private final AtomicBoolean isWorking = new AtomicBoolean(false);
     private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
 
@@ -46,24 +48,25 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
         materialRandomness = Utils.parseMaterialProbability(getValues("material", false));
         materialScoreMap = Utils.parseMaterialNumberMap(getValues("material-score", false));
         defaultPoint = getInstance("default-point", 1, Number.class).intValue();
+        removeProjectileOnHit = getInstance("remove-projectile-on-hit", false, Boolean.class);
 
         if (materialRandomness.isEmpty()) {
             materialRandomness.add(XMaterial.STONE, 1);
         }
     }
 
-    private Location spawnNewLocation() {
+    private Pair<Location, XMaterial> spawnNewLocation() {
         Location location;
         do {
             location = boundingFeature.getRandomLocation();
-        } while (spawnBlocks.contains(location));
+        } while (spawnBlocks.containsKey(location));
         XMaterial xMaterial = materialRandomness.get();
         Material material = Optional.ofNullable(xMaterial.parseMaterial()).orElse(Material.STONE);
         Block block = location.getBlock();
         BlockUtil.getHandler().setBlock(block, material, xMaterial.getData(), false, true);
         BlockUtil.getHandler().updateLight(block);
         BlockUtil.getHandler().sendChunkUpdate(block.getChunk());
-        return location;
+        return Pair.of(location, xMaterial);
     }
 
     private BukkitTask createBlockTask() {
@@ -71,7 +74,10 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
             @Override
             public void run() {
                 if (spawnBlocks.size() < maxBlock) {
-                    spawnBlocks.add(spawnNewLocation());
+                    Pair<Location, XMaterial> blockPair = spawnNewLocation();
+                    Location location = blockPair.getKey();
+                    int point = materialScoreMap.getOrDefault(blockPair.getValue(), defaultPoint);
+                    spawnBlocks.put(location, point);
                 }
             }
         }.runTaskTimer(instance, 0, 5);
@@ -80,7 +86,7 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
     private BukkitTask createClearBlockTask() {
         isWorking.set(true);
         return new BukkitRunnable() {
-            private final ListIterator<Location> iterator = spawnBlocks.listIterator();
+            private final ListIterator<Location> iterator = new ArrayList<>(spawnBlocks.keySet()).listIterator();
             private final HashSet<Chunk> chunks = new HashSet<>();
 
             @Override
@@ -107,7 +113,7 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         Location location = block.getLocation();
-        if (spawnBlocks.contains(location)) {
+        if (spawnBlocks.containsKey(location)) {
             event.setCancelled(true);
         }
     }
@@ -121,19 +127,17 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
         ProjectileSource source = projectile.getShooter();
 
         Location location = block.getLocation();
-        if (!spawnBlocks.contains(location)) return;
-        spawnBlocks.remove(location);
-        projectile.remove();
+        if (!spawnBlocks.containsKey(location)) return;
+        int point = spawnBlocks.remove(location);
+        if (removeProjectileOnHit) projectile.remove();
 
-        XMaterial material = XMaterial.matchXMaterial(block.getType());
         BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, true);
         BlockUtil.getHandler().updateLight(block);
         BlockUtil.getHandler().sendChunkUpdate(block.getChunk());
 
         if (!(source instanceof Player)) return;
         Player player = (Player) source;
-        int score = materialScoreMap.getOrDefault(material, defaultPoint);
-        pointFeature.applyPoint(player.getUniqueId(), score);
+        pointFeature.applyPoint(player.getUniqueId(), point);
     }
 
     @Override
@@ -195,11 +199,11 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
     @Override
     public void clear() {
         Utils.cancelSafe(currentTask.getAndSet(null));
-        Utils.clearAllBlocks(spawnBlocks);
+        isWorking.set(false);
+        Utils.clearAllBlocks(spawnBlocks.keySet());
+        spawnBlocks.clear();
         HandlerList.unregisterAll(this);
         boundingFeature.clear();
-        spawnBlocks.clear();
-        isWorking.set(false);
         super.clear();
     }
 }
