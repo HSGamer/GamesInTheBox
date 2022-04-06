@@ -91,8 +91,8 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
                 if (currentBat != null) {
                     if (currentBat.isValid() && boundingFeature.checkBounding(currentBat.getLocation())) {
                         spawnedBats.add(currentBat);
-                    } else if (currentBat.isValid()) {
-                        currentBat.remove();
+                    } else {
+                        Utils.despawnSafe(currentBat);
                     }
                 }
                 int size = spawnedBats.size();
