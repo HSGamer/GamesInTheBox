@@ -28,7 +28,12 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
     private final BoundingFeature boundingFeature;
 
     private final int point;
-    private final int spawnOffset;
+    private final int spawnOffsetMinX;
+    private final int spawnOffsetMaxX;
+    private final int spawnOffsetMinY;
+    private final int spawnOffsetMaxY;
+    private final int spawnOffsetMinZ;
+    private final int spawnOffsetMaxZ;
     private final int maxSpawn;
 
     private final List<LivingEntity> spawnedBats = new LinkedList<>();
@@ -38,19 +43,24 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
         super(arena, name);
         boundingFeature = BoundingFeature.of(this);
         point = getInstance("point", 1, Number.class).intValue();
-        spawnOffset = getInstance("spawn-offset", 0, Number.class).intValue();
+        spawnOffsetMinX = getInstance("spawn-offset.min-x", 0, Number.class).intValue();
+        spawnOffsetMaxX = getInstance("spawn-offset.max-x", 0, Number.class).intValue();
+        spawnOffsetMinY = getInstance("spawn-offset.min-y", 0, Number.class).intValue();
+        spawnOffsetMaxY = getInstance("spawn-offset.max-y", 0, Number.class).intValue();
+        spawnOffsetMinZ = getInstance("spawn-offset.min-z", 0, Number.class).intValue();
+        spawnOffsetMaxZ = getInstance("spawn-offset.max-z", 0, Number.class).intValue();
         maxSpawn = getInstance("max-spawn", 10, Number.class).intValue();
     }
 
     private Location getRandomLocation() {
         BlockBox box = boundingFeature.getBlockBox();
         World world = boundingFeature.getWorld();
-        int minX = box.minX + spawnOffset;
-        int maxX = box.maxX - spawnOffset;
-        int minY = box.minY + spawnOffset;
-        int maxY = box.maxY - spawnOffset;
-        int minZ = box.minZ + spawnOffset;
-        int maxZ = box.maxZ - spawnOffset;
+        int minX = box.minX + spawnOffsetMinX;
+        int maxX = box.maxX - spawnOffsetMaxX;
+        int minY = box.minY + spawnOffsetMinY;
+        int maxY = box.maxY - spawnOffsetMaxY;
+        int minZ = box.minZ + spawnOffsetMinZ;
+        int maxZ = box.maxZ - spawnOffsetMaxZ;
 
         int x = ThreadLocalRandom.current().nextInt(minX, maxX + 1);
         int y = ThreadLocalRandom.current().nextInt(minY, maxY + 1);
