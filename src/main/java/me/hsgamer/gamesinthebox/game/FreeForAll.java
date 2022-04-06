@@ -3,9 +3,7 @@ package me.hsgamer.gamesinthebox.game;
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.feature.game.BlockParticleFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
-import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.minigamecore.base.Arena;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -50,6 +48,16 @@ public class FreeForAll extends BaseArenaGame implements Listener {
         );
     }
 
+    @Override
+    protected String getStartBroadcast() {
+        return instance.getMessageConfig().getFFAStartBroadcast();
+    }
+
+    @Override
+    protected String getEndBroadcast() {
+        return instance.getMessageConfig().getFFAEndBroadcast();
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
@@ -67,8 +75,6 @@ public class FreeForAll extends BaseArenaGame implements Listener {
     @Override
     public void onInGameStart() {
         super.onInGameStart();
-        String startMessage = instance.getMessageConfig().getFFAStartBroadcast().replace("{name}", arena.getName());
-        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, startMessage));
         instance.registerListener(this);
         blockParticleFeature.start(boundingFeature);
     }
@@ -78,13 +84,6 @@ public class FreeForAll extends BaseArenaGame implements Listener {
         super.onInGameOver();
         HandlerList.unregisterAll(this);
         blockParticleFeature.stop();
-    }
-
-    @Override
-    public void onEndingStart() {
-        super.onEndingStart();
-        String endMessage = instance.getMessageConfig().getFFAEndBroadcast().replace("{name}", arena.getName());
-        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
     }
 
     @Override

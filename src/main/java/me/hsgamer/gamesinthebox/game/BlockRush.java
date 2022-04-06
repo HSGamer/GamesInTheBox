@@ -10,9 +10,7 @@ import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.state.InGameState;
 import me.hsgamer.gamesinthebox.util.Utils;
-import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.minigamecore.base.Arena;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -74,6 +72,16 @@ public class BlockRush extends BaseArenaGame implements Listener {
         return Map.of("point", point);
     }
 
+    @Override
+    protected String getStartBroadcast() {
+        return instance.getMessageConfig().getRushStartBroadcast();
+    }
+
+    @Override
+    protected String getEndBroadcast() {
+        return instance.getMessageConfig().getRushEndBroadcast();
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
@@ -127,17 +135,8 @@ public class BlockRush extends BaseArenaGame implements Listener {
     }
 
     @Override
-    public void onInGameStart() {
-        super.onInGameStart();
-        String startMessage = instance.getMessageConfig().getRushStartBroadcast().replace("{name}", arena.getName());
-        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, startMessage));
-    }
-
-    @Override
     public void onEndingStart() {
         super.onEndingStart();
-        String endMessage = instance.getMessageConfig().getRushEndBroadcast().replace("{name}", arena.getName());
-        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
 
         Iterator<Location> iterator = blockLocations.iterator();
         isWorking.set(true);

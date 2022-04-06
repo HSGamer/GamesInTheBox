@@ -8,7 +8,6 @@ import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.hscore.common.CollectionUtils;
 import me.hsgamer.minigamecore.base.Arena;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -120,11 +119,18 @@ public class Pinata extends BaseArenaGame implements Listener {
     }
 
     @Override
+    protected String getStartBroadcast() {
+        return instance.getMessageConfig().getPinataStartBroadcast();
+    }
+
+    @Override
+    protected String getEndBroadcast() {
+        return instance.getMessageConfig().getPinataEndBroadcast();
+    }
+
+    @Override
     public void onInGameStart() {
         super.onInGameStart();
-        String startMessage = instance.getMessageConfig().getPinataStartBroadcast().replace("{name}", arena.getName());
-        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, startMessage));
-
         currentPinata.set(spawnPinata());
         currentTask.set(createPinataTask());
         instance.registerListener(this);
@@ -136,13 +142,6 @@ public class Pinata extends BaseArenaGame implements Listener {
         HandlerList.unregisterAll(this);
         Utils.cancelSafe(currentTask.getAndSet(null));
         Utils.despawnSafe(currentPinata.getAndSet(null));
-    }
-
-    @Override
-    public void onEndingStart() {
-        super.onEndingStart();
-        String endMessage = instance.getMessageConfig().getKOTHEndBroadcast().replace("{name}", arena.getName());
-        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
     }
 
     @Override

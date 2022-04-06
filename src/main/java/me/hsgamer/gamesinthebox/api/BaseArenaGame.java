@@ -4,9 +4,11 @@ import me.hsgamer.gamesinthebox.feature.CooldownFeature;
 import me.hsgamer.gamesinthebox.feature.game.PointFeature;
 import me.hsgamer.gamesinthebox.feature.game.RewardFeature;
 import me.hsgamer.gamesinthebox.util.Utils;
+import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import me.hsgamer.minigamecore.implementation.feature.single.TimerFeature;
+import org.bukkit.Bukkit;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +61,10 @@ public abstract class BaseArenaGame extends ArenaGame {
         pointFeature.clear();
     }
 
+    protected abstract String getStartBroadcast();
+
+    protected abstract String getEndBroadcast();
+
     @Override
     public void onWaitingStart() {
         timerFeature.setDuration(waitingTime, timeUnit);
@@ -73,6 +79,8 @@ public abstract class BaseArenaGame extends ArenaGame {
     public void onInGameStart() {
         timerFeature.setDuration(inGameTime, timeUnit);
         pointFeature.setTopSnapshot(true);
+        String startMessage = getStartBroadcast().replace("{name}", arena.getName());
+        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, startMessage));
     }
 
     @Override
@@ -89,6 +97,8 @@ public abstract class BaseArenaGame extends ArenaGame {
     @Override
     public void onEndingStart() {
         rewardFeature.tryReward(pointFeature.getTopUUID());
+        String endMessage = getEndBroadcast().replace("{name}", arena.getName());
+        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
     }
 
     @Override

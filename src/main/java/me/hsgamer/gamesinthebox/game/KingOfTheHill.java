@@ -3,7 +3,6 @@ package me.hsgamer.gamesinthebox.game;
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.feature.game.BlockParticleFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
-import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -51,10 +50,18 @@ public class KingOfTheHill extends BaseArenaGame {
     }
 
     @Override
+    protected String getStartBroadcast() {
+        return instance.getMessageConfig().getKOTHStartBroadcast();
+    }
+
+    @Override
+    protected String getEndBroadcast() {
+        return instance.getMessageConfig().getKOTHEndBroadcast();
+    }
+
+    @Override
     public void onInGameStart() {
         super.onInGameStart();
-        String startMessage = instance.getMessageConfig().getKOTHStartBroadcast().replace("{name}", arena.getName());
-        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, startMessage));
         blockParticleFeature.start(boundingFeature);
     }
 
@@ -85,13 +92,6 @@ public class KingOfTheHill extends BaseArenaGame {
     public void onInGameOver() {
         super.onInGameOver();
         blockParticleFeature.stop();
-    }
-
-    @Override
-    public void onEndingStart() {
-        super.onEndingStart();
-        String endMessage = instance.getMessageConfig().getKOTHEndBroadcast().replace("{name}", arena.getName());
-        Bukkit.getOnlinePlayers().forEach(player -> MessageUtils.sendMessage(player, endMessage));
     }
 
     @Override
