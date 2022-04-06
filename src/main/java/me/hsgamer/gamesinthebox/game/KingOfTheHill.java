@@ -22,7 +22,7 @@ public class KingOfTheHill extends BaseArenaGame {
 
     public KingOfTheHill(Arena arena, String name) {
         super(arena, name);
-        boundingFeature = BoundingFeature.of(this);
+        boundingFeature = BoundingFeature.of(this, true);
         blockParticleFeature = BlockParticleFeature.of(this);
 
         pointAdd = getInstance("point.add", 5, Number.class).intValue();

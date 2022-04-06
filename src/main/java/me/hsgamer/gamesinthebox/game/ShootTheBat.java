@@ -42,7 +42,7 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
 
     public ShootTheBat(Arena arena, String name) {
         super(arena, name);
-        boundingFeature = BoundingFeature.of(this);
+        boundingFeature = BoundingFeature.of(this, true);
         point = getInstance("point", 1, Number.class).intValue();
         spawnOffsetMinX = getInstance("spawn-offset.min-x", 0, Number.class).intValue();
         spawnOffsetMaxX = getInstance("spawn-offset.max-x", 0, Number.class).intValue();

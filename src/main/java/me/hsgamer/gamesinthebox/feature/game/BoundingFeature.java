@@ -20,7 +20,7 @@ public class BoundingFeature implements Feature {
         this.blockBox = blockBox;
     }
 
-    public static BoundingFeature of(ArenaGame arenaGame, String worldPath, String pos1Path, String pos2Path) {
+    public static BoundingFeature of(ArenaGame arenaGame, String worldPath, String pos1Path, String pos2Path, boolean maxInclusive) {
         String worldName = arenaGame.getString(worldPath, "");
         World world = Bukkit.getWorld(worldName);
         if (world == null) {
@@ -34,11 +34,11 @@ public class BoundingFeature implements Feature {
         if (pos2 == null) {
             throw new IllegalStateException(arenaGame.getName() + " has invalid position 2");
         }
-        return new BoundingFeature(world, new BlockBox(pos1, pos2, true));
+        return new BoundingFeature(world, new BlockBox(pos1, pos2, maxInclusive));
     }
 
-    public static BoundingFeature of(ArenaGame arenaGame) {
-        return of(arenaGame, "world", "pos1", "pos2");
+    public static BoundingFeature of(ArenaGame arenaGame, boolean maxInclusive) {
+        return of(arenaGame, "world", "pos1", "pos2", maxInclusive);
     }
 
     public boolean checkBounding(UUID uuid) {

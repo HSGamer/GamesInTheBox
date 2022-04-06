@@ -43,7 +43,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
 
     public BlockRush(Arena arena, String name) {
         super(arena, name);
-        boundingFeature = BoundingFeature.of(this);
+        boundingFeature = BoundingFeature.of(this, false);
         blockIterator = BlockIteratorUtil.get(getString("bounding-iterator", "default"), boundingFeature.getBlockBox());
 
         point = getInstance("point", 1, Number.class).intValue();
@@ -122,7 +122,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
                         break;
                     }
                 }
-                chunks.forEach(chunk -> BlockUtil.getHandler().setChunkUpdate(chunk));
+                chunks.forEach(chunk -> BlockUtil.getHandler().sendChunkUpdate(chunk));
             }
         };
         BukkitTask task = runnable.runTaskTimer(instance, 0, 0);
@@ -155,7 +155,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
                         break;
                     }
                 }
-                chunks.forEach(chunk -> BlockUtil.getHandler().setChunkUpdate(chunk));
+                chunks.forEach(chunk -> BlockUtil.getHandler().sendChunkUpdate(chunk));
             }
         };
         BukkitTask task = runnable.runTaskTimer(instance, 0, 0);
@@ -184,7 +184,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
             BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, false);
             chunks.add(block.getChunk());
         });
-        chunks.forEach(chunk -> BlockUtil.getHandler().setChunkUpdate(chunk));
+        chunks.forEach(chunk -> BlockUtil.getHandler().sendChunkUpdate(chunk));
 
         HandlerList.unregisterAll(this);
         boundingFeature.clear();
