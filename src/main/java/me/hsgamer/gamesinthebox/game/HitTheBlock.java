@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -115,14 +116,20 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
     public void onProjectileHit(ProjectileHitEvent event) {
         Block block = event.getHitBlock();
         if (block == null) return;
+
+        Projectile projectile = event.getEntity();
+        ProjectileSource source = projectile.getShooter();
+
         Location location = block.getLocation();
         if (!spawnBlocks.contains(location)) return;
+        spawnBlocks.remove(location);
+        projectile.remove();
+
         XMaterial material = XMaterial.matchXMaterial(block.getType());
         BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, true);
         BlockUtil.getHandler().updateLight(block);
         BlockUtil.getHandler().sendChunkUpdate(block.getChunk());
 
-        ProjectileSource source = event.getEntity().getShooter();
         if (!(source instanceof Player)) return;
         Player player = (Player) source;
         int score = materialScoreMap.getOrDefault(material, defaultPoint);
