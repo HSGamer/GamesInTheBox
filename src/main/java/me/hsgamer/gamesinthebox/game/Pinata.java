@@ -55,16 +55,16 @@ public class Pinata extends BaseArenaGame implements Listener {
         LivingEntity pinata = (LivingEntity) world.spawnEntity(spawnLocation, entityType);
         pinata.setCustomName(getRandomNameTag());
         pinata.setCustomNameVisible(true);
+        pinata.setRemoveWhenFarAway(false);
+        pinata.setCanPickupItems(false);
         Objects.requireNonNull(pinata.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(100);
+        pinata.setHealth(100);
         if (pinataSpeed >= 0) {
             Objects.requireNonNull(pinata.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(pinataSpeed);
         }
         if (maxNoDamageTicks >= 0) {
             pinata.setMaximumNoDamageTicks(maxNoDamageTicks);
         }
-        pinata.setHealth(100);
-        pinata.setRemoveWhenFarAway(false);
-        pinata.setCanPickupItems(false);
         if (pinata instanceof Ageable) {
             ((Ageable) pinata).setAgeLock(true);
         }
