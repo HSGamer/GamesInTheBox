@@ -69,6 +69,10 @@ public abstract class ArenaGame implements Initializer {
         return configFeature.contains(getCommonPath(path));
     }
 
+    public final boolean containsPath(String path) {
+        return containsSetting(path) || containsCommon(path);
+    }
+
     public void onWaitingStart() {
         // EMPTY
     }

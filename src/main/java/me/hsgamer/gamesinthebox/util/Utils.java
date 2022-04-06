@@ -7,6 +7,8 @@ import me.hsgamer.hscore.common.CollectionUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -70,5 +72,18 @@ public final class Utils {
     public static String getRandomColorizedString(Collection<String> collection, String defaultValue) {
         String s = Optional.ofNullable(CollectionUtils.pickRandom(collection)).orElse(defaultValue);
         return MessageUtils.colorize(s);
+    }
+
+    public static EntityType tryGetLivingEntityType(String entityType, EntityType defaultValue) {
+        try {
+            EntityType type = EntityType.valueOf(entityType.toUpperCase(Locale.ROOT));
+            Class<? extends Entity> clazz = type.getEntityClass();
+            if (clazz != null && LivingEntity.class.isAssignableFrom(clazz)) {
+                return type;
+            }
+        } catch (Exception ignored) {
+            // IGNORED
+        }
+        return defaultValue;
     }
 }

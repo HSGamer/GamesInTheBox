@@ -9,9 +9,10 @@ import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Ageable;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -31,6 +32,7 @@ public class Pinata extends BaseArenaGame implements Listener {
 
     private final Location spawnLocation;
 
+    private final EntityType entityType;
     private final AtomicReference<LivingEntity> currentPinata = new AtomicReference<>();
     private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
 
@@ -42,25 +44,31 @@ public class Pinata extends BaseArenaGame implements Listener {
         boundingFeature = BoundingFeature.of(this, true);
         spawnLocation = Objects.requireNonNull(LocationUtils.getLocation(getString("spawn-location", "")), "spawn-location is null");
         particleDisplay = ParticleDisplay.fromConfig(Utils.createSection(getValues("particle", false)));
-        pinataSpeed = getInstance("pinata.speed", 0.23, Number.class).doubleValue();
-        maxNoDamageTicks = getInstance("pinata.max-no-damage-ticks", 20, Number.class).intValue();
+        pinataSpeed = getInstance("pinata.speed", -1, Number.class).doubleValue();
+        maxNoDamageTicks = getInstance("pinata.max-no-damage-ticks", -1, Number.class).intValue();
+        entityType = Utils.tryGetLivingEntityType(getString("entity-type", "SHEEP"), EntityType.SHEEP);
     }
 
     private LivingEntity spawnPinata() {
         World world = spawnLocation.getWorld();
         assert world != null;
-        return world.spawn(spawnLocation, Sheep.class, sheep -> {
-            sheep.setAdult();
-            sheep.setCustomName(getRandomNameTag());
-            sheep.setCustomNameVisible(true);
-            Objects.requireNonNull(sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(100);
-            Objects.requireNonNull(sheep.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(pinataSpeed);
-            sheep.setMaximumNoDamageTicks(maxNoDamageTicks);
-            sheep.setHealth(100);
-            sheep.setRemoveWhenFarAway(false);
-            sheep.setAgeLock(true);
-            sheep.setCanPickupItems(false);
-        });
+        LivingEntity pinata = (LivingEntity) world.spawnEntity(spawnLocation, entityType);
+        pinata.setCustomName(getRandomNameTag());
+        pinata.setCustomNameVisible(true);
+        Objects.requireNonNull(pinata.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(100);
+        if (pinataSpeed >= 0) {
+            Objects.requireNonNull(pinata.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(pinataSpeed);
+        }
+        if (maxNoDamageTicks >= 0) {
+            pinata.setMaximumNoDamageTicks(maxNoDamageTicks);
+        }
+        pinata.setHealth(100);
+        pinata.setRemoveWhenFarAway(false);
+        pinata.setCanPickupItems(false);
+        if (pinata instanceof Ageable) {
+            ((Ageable) pinata).setAgeLock(true);
+        }
+        return pinata;
     }
 
     private String getRandomNameTag() {
