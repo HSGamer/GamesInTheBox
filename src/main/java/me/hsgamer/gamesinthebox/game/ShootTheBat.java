@@ -21,6 +21,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -36,7 +37,7 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
     private final int spawnOffsetMaxZ;
     private final int maxSpawn;
 
-    private final List<LivingEntity> spawnedBats = new LinkedList<>();
+    private final Queue<LivingEntity> spawnedBats = new LinkedList<>();
     private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
 
     public ShootTheBat(Arena arena, String name) {
@@ -86,23 +87,20 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
         return new BukkitRunnable() {
             @Override
             public void run() {
-                spawnedBats.removeIf(livingEntity -> {
-                    if (!livingEntity.isValid()) {
-                        return true;
-                    } else if (!boundingFeature.checkBounding(livingEntity.getLocation())) {
-                        livingEntity.remove();
-                        return true;
-                    }
-                    return false;
-                });
-                int size = spawnedBats.size();
-                if (size < maxSpawn) {
-                    for (int i = 0; i < maxSpawn - size; i++) {
-                        spawnedBats.add(spawnBat());
+                LivingEntity currentBat = spawnedBats.poll();
+                if (currentBat != null) {
+                    if (currentBat.isValid() && boundingFeature.checkBounding(currentBat.getLocation())) {
+                        spawnedBats.add(currentBat);
+                    } else if (currentBat.isValid()) {
+                        currentBat.remove();
                     }
                 }
+                int size = spawnedBats.size();
+                if (size < maxSpawn) {
+                    spawnedBats.add(spawnBat());
+                }
             }
-        }.runTaskTimer(instance, 0, 20);
+        }.runTaskTimer(instance, 0, 5);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
