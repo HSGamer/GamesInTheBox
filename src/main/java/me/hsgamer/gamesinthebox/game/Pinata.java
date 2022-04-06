@@ -5,8 +5,6 @@ import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.util.LocationUtils;
 import me.hsgamer.gamesinthebox.util.Utils;
-import me.hsgamer.hscore.bukkit.utils.MessageUtils;
-import me.hsgamer.hscore.common.CollectionUtils;
 import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -25,7 +23,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Pinata extends BaseArenaGame implements Listener {
@@ -67,9 +64,7 @@ public class Pinata extends BaseArenaGame implements Listener {
     }
 
     private String getRandomNameTag() {
-        String tag = Optional.ofNullable(CollectionUtils.pickRandom(instance.getMessageConfig().getPinataNameTag()))
-                .orElse("&cPinata");
-        return MessageUtils.colorize(tag);
+        return Utils.getRandomColorizedString(instance.getMessageConfig().getPinataNameTag(), "&c&lPINATA");
     }
 
     private BukkitTask createPinataTask() {
@@ -77,7 +72,7 @@ public class Pinata extends BaseArenaGame implements Listener {
             @Override
             public void run() {
                 LivingEntity pinata = currentPinata.get();
-                if (pinata == null || pinata.isDead()) {
+                if (pinata == null || !pinata.isValid()) {
                     currentPinata.set(spawnPinata());
                 } else if (!boundingFeature.checkBounding(pinata.getLocation())) {
                     pinata.teleport(spawnLocation);

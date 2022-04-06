@@ -171,4 +171,31 @@ public interface MessageConfig {
         return List.of("&c&lHIT ME!", "&c&lMORE!");
     }
     //endregion
+
+    //region Shoot the bat
+    @ConfigPath("shoot-the-bat.name")
+    default String getShootTheBatDisplayName() {
+        return "&cShoot the Bat";
+    }
+
+    @ConfigPath(value = "shoot-the-bat.description", converter = StringListConverter.class)
+    default List<String> getShootTheBatDescription() {
+        return List.of("&7A game where you have to shoot the bat");
+    }
+
+    @ConfigPath("shoot-the-bat.start-broadcast")
+    default String getShootTheBatStartBroadcast() {
+        return "&aThe arena {name} was started. Shoot the bat!";
+    }
+
+    @ConfigPath("shoot-the-bat.end-broadcast")
+    default String getShootTheBatEndBroadcast() {
+        return "&eThe arena {name} was ended. Thanks!";
+    }
+
+    @ConfigPath(value = "shoot-the-bat.name-tag", converter = StringListConverter.class)
+    default List<String> getShootTheBatNameTag() {
+        return List.of("&c&lSHOOT ME!", "&c&lMORE!");
+    }
+    //endregion
 }

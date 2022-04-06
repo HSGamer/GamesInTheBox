@@ -2,15 +2,14 @@ package me.hsgamer.gamesinthebox.util;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.lewdev.probabilitylib.ProbabilityCollection;
+import me.hsgamer.hscore.bukkit.utils.MessageUtils;
+import me.hsgamer.hscore.common.CollectionUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public final class Utils {
@@ -66,5 +65,10 @@ public final class Utils {
                 // IGNORED
             }
         }
+    }
+
+    public static String getRandomColorizedString(Collection<String> collection, String defaultValue) {
+        String s = Optional.ofNullable(CollectionUtils.pickRandom(collection)).orElse(defaultValue);
+        return MessageUtils.colorize(s);
     }
 }
