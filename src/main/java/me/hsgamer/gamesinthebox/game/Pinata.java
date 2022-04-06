@@ -40,7 +40,7 @@ public class Pinata extends BaseArenaGame implements Listener {
     public Pinata(Arena arena, String name) {
         super(arena, name);
         boundingFeature = BoundingFeature.of(this, true);
-        spawnLocation = Objects.requireNonNull(LocationUtils.getLocation(getString("spawn-location", "world,0,0,0")), "spawn-location is null");
+        spawnLocation = Objects.requireNonNull(LocationUtils.getLocation(getString("spawn-location", "")), "spawn-location is null");
         particleDisplay = ParticleDisplay.fromConfig(Utils.createSection(getValues("particle", false)));
         pinataSpeed = getInstance("pinata.speed", 0.23, Number.class).doubleValue();
         maxNoDamageTicks = getInstance("pinata.max-no-damage-ticks", 20, Number.class).intValue();
