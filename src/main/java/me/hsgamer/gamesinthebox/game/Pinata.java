@@ -36,6 +36,7 @@ public class Pinata extends BaseArenaGame implements Listener {
     private final double pinataSpeed;
     private final int maxNoDamageTicks;
     private final boolean babyEntity;
+    private final boolean glowing;
 
     private final AtomicReference<LivingEntity> currentPinata = new AtomicReference<>();
     private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
@@ -49,6 +50,7 @@ public class Pinata extends BaseArenaGame implements Listener {
         maxNoDamageTicks = getInstance("pinata.max-no-damage-ticks", -1, Number.class).intValue();
         entityType = Utils.tryGetLivingEntityType(getString("pinata.type", "SHEEP"), EntityType.SHEEP);
         babyEntity = getInstance("pinata.baby", false, Boolean.class);
+        glowing = getInstance("pinata.glowing", false, Boolean.class);
     }
 
     private LivingEntity spawnPinata() {
@@ -59,6 +61,7 @@ public class Pinata extends BaseArenaGame implements Listener {
         pinata.setCustomNameVisible(true);
         pinata.setRemoveWhenFarAway(false);
         pinata.setCanPickupItems(false);
+        pinata.setGlowing(glowing);
         if (pinataSpeed >= 0) {
             AttributeInstance attributeInstance = pinata.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
             if (attributeInstance != null) {
