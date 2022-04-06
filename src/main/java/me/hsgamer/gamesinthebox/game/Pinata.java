@@ -31,13 +31,13 @@ public class Pinata extends BaseArenaGame implements Listener {
     private final ParticleDisplay particleDisplay;
 
     private final Location spawnLocation;
-
     private final EntityType entityType;
-    private final AtomicReference<LivingEntity> currentPinata = new AtomicReference<>();
-    private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
-
     private final double pinataSpeed;
     private final int maxNoDamageTicks;
+    private final boolean babyEntity;
+
+    private final AtomicReference<LivingEntity> currentPinata = new AtomicReference<>();
+    private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
 
     public Pinata(Arena arena, String name) {
         super(arena, name);
@@ -46,7 +46,8 @@ public class Pinata extends BaseArenaGame implements Listener {
         particleDisplay = ParticleDisplay.fromConfig(Utils.createSection(getValues("particle", false)));
         pinataSpeed = getInstance("pinata.speed", -1, Number.class).doubleValue();
         maxNoDamageTicks = getInstance("pinata.max-no-damage-ticks", -1, Number.class).intValue();
-        entityType = Utils.tryGetLivingEntityType(getString("entity-type", "SHEEP"), EntityType.SHEEP);
+        entityType = Utils.tryGetLivingEntityType(getString("pinata.type", "SHEEP"), EntityType.SHEEP);
+        babyEntity = getInstance("pinata.baby", false, Boolean.class);
     }
 
     private LivingEntity spawnPinata() {
@@ -67,6 +68,11 @@ public class Pinata extends BaseArenaGame implements Listener {
         }
         if (pinata instanceof Ageable) {
             ((Ageable) pinata).setAgeLock(true);
+            if (babyEntity) {
+                ((Ageable) pinata).setBaby();
+            } else {
+                ((Ageable) pinata).setAdult();
+            }
         }
         return pinata;
     }
