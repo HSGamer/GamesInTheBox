@@ -51,12 +51,7 @@ public class BoundingFeature implements Feature {
         if (location.getWorld() != world) {
             return false;
         }
-        return blockBox.minX <= location.getX()
-                && blockBox.maxX >= location.getX()
-                && blockBox.minY <= location.getY()
-                && blockBox.maxY >= location.getY()
-                && blockBox.minZ <= location.getZ()
-                && blockBox.maxZ >= location.getZ();
+        return blockBox.contains(location);
     }
 
     public Location getRandomLocation(VectorOffsetSetting vectorOffsetSetting) {
@@ -72,6 +67,10 @@ public class BoundingFeature implements Feature {
         return new Location(world, x, y, z);
     }
 
+    public Location getRandomLocation() {
+        return getRandomLocation(VectorOffsetSetting.DEFAULT);
+    }
+
     public World getWorld() {
         return world;
     }
@@ -81,6 +80,7 @@ public class BoundingFeature implements Feature {
     }
 
     public static class VectorOffsetSetting {
+        public static final VectorOffsetSetting DEFAULT = new VectorOffsetSetting(0, 0, 0, 0, 0, 0);
         public final int minXOffset;
         public final int maxXOffset;
         public final int minYOffset;
@@ -95,10 +95,6 @@ public class BoundingFeature implements Feature {
             this.maxYOffset = maxYOffset;
             this.minZOffset = minZOffset;
             this.maxZOffset = maxZOffset;
-        }
-
-        public VectorOffsetSetting() {
-            this(0, 0, 0, 0, 0, 0);
         }
 
         public static VectorOffsetSetting of(ArenaGame arenaGame, String path) {

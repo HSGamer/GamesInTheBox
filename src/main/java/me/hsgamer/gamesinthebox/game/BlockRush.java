@@ -178,14 +178,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
     @Override
     public void clear() {
         Utils.cancelSafe(currentTask.getAndSet(null));
-        HashSet<Chunk> chunks = new HashSet<>();
-        blockLocations.forEach(location -> {
-            Block block = location.getBlock();
-            BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, false);
-            chunks.add(block.getChunk());
-        });
-        chunks.forEach(chunk -> BlockUtil.getHandler().sendChunkUpdate(chunk));
-
+        Utils.clearAllBlocks(blockLocations);
         HandlerList.unregisterAll(this);
         boundingFeature.clear();
         blockIterator.reset();

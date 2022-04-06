@@ -17,6 +17,7 @@ public class ArenaGameBuilder extends Builder<Pair<Arena, String>, ArenaGame> {
         registerSimple(BlockRush::new, "block_rush", "rush");
         registerSimple(Pinata::new, "pinata", "pin");
         registerSimple(ShootTheBat::new, "shoot_the_bat", "stb");
+        registerSimple(HitTheBlock::new, "hit_the_block", "htb");
     }
 
     public void registerSimple(BiFunction<Arena, String, ArenaGame> function, String type, String... aliases) {

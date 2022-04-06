@@ -2,8 +2,13 @@ package me.hsgamer.gamesinthebox.util;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.lewdev.probabilitylib.ProbabilityCollection;
+import me.hsgamer.blockutil.api.BlockUtil;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.hscore.common.CollectionUtils;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Entity;
@@ -33,19 +38,25 @@ public final class Utils {
         return section;
     }
 
-    public static ProbabilityCollection<XMaterial> parseMaterialProbability(Map<String, Object> values) {
-        ProbabilityCollection<XMaterial> collection = new ProbabilityCollection<>();
+    public static Map<XMaterial, Integer> parseMaterialNumberMap(Map<String, Object> values) {
+        Map<XMaterial, Integer> map = new EnumMap<>(XMaterial.class);
         values.forEach((k, v) -> {
             Optional<XMaterial> optionalXMaterial = XMaterial.matchXMaterial(k);
             if (optionalXMaterial.isEmpty()) return;
-            int probability;
+            int value;
             try {
-                probability = Integer.parseInt(Objects.toString(v));
+                value = Integer.parseInt(Objects.toString(v));
             } catch (Exception e) {
                 return;
             }
-            collection.add(optionalXMaterial.get(), probability);
+            map.put(optionalXMaterial.get(), value);
         });
+        return map;
+    }
+
+    public static ProbabilityCollection<XMaterial> parseMaterialProbability(Map<String, Object> values) {
+        ProbabilityCollection<XMaterial> collection = new ProbabilityCollection<>();
+        parseMaterialNumberMap(values).forEach(collection::add);
         return collection;
     }
 
@@ -85,5 +96,15 @@ public final class Utils {
             // IGNORED
         }
         return defaultValue;
+    }
+
+    public static void clearAllBlocks(Collection<Location> locations) {
+        HashSet<Chunk> chunks = new HashSet<>();
+        locations.forEach(location -> {
+            Block block = location.getBlock();
+            BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, false);
+            chunks.add(block.getChunk());
+        });
+        chunks.forEach(chunk -> BlockUtil.getHandler().sendChunkUpdate(chunk));
     }
 }
