@@ -73,6 +73,10 @@ public abstract class ArenaGame implements Initializer {
         return containsSetting(path) || containsCommon(path);
     }
 
+    public final void set(String path, Object value) {
+        configFeature.set(getSettingPath(path), value);
+    }
+
     public void onWaitingStart() {
         // EMPTY
     }

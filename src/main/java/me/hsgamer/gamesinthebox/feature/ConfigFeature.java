@@ -50,5 +50,10 @@ public class ConfigFeature extends ArenaFeature<ConfigFeature.ArenaConfigFeature
         public boolean contains(String path) {
             return instance.getArenaConfig().contains(arena.getName() + "." + path);
         }
+
+        public void set(String path, Object value) {
+            instance.getArenaConfig().set(arena.getName() + "." + path, value);
+            instance.getArenaConfig().save();
+        }
     }
 }
