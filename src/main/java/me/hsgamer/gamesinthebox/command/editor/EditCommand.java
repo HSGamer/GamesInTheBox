@@ -33,7 +33,7 @@ public class EditCommand extends SubCommand {
 
         Optional<ArenaGame> optionalGame = arena.getArenaFeature(GameFeature.class).getGame(args[1]);
         if (optionalGame.isEmpty()) {
-            optionalGame = arena.getArenaFeature(EditorFeature.class).getArena(args[1]);
+            optionalGame = arena.getArenaFeature(EditorFeature.class).getGame(args[1]);
         }
         if (optionalGame.isEmpty()) {
             MessageUtils.sendMessage(sender, instance.getMessageConfig().getGameNotFound());
@@ -72,34 +72,33 @@ public class EditCommand extends SubCommand {
     @Override
     public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String label, @NotNull String... args) {
         if (args.length == 1) {
-            return instance.getArenaManager().getAllArenas().stream()
-                    .map(Arena::getName)
+            return instance.getArenaManager().getFeature(EditorFeature.class).getArenaNames()
+                    .stream()
                     .filter(s -> args[0].isEmpty() || s.startsWith(args[0]))
                     .collect(Collectors.toList());
         } else if (args.length == 2) {
-            return instance.getArenaManager().getArenaByName(args[0])
+            return instance.getArenaManager().getFeature(EditorFeature.class).getArena(args[0])
                     .map(arena -> {
                         List<String> list = new ArrayList<>(arena.getArenaFeature(GameFeature.class).getAvailableGames());
-                        list.addAll(arena.getArenaFeature(EditorFeature.class).getEditingArenas());
+                        list.addAll(arena.getArenaFeature(EditorFeature.class).getEditingGames());
                         return list;
                     })
                     .orElse(Collections.emptyList());
         } else if (args.length == 3) {
             return List.of("true", "false");
         } else if (args.length == 4) {
-            Optional<Arena> optional = instance.getArenaManager().getArenaByName(args[0]);
-            if (optional.isPresent()) {
-                Arena arena = optional.get();
-                ArenaGame game = arena.getArenaFeature(GameFeature.class).getGame(args[1]).orElse(null);
-                if (game != null) {
-                    game = arena.getArenaFeature(EditorFeature.class).getArena(args[1]).orElse(null);
-                }
-                if (game != null) {
-                    return game.getEditors().keySet().stream()
+            return instance.getArenaManager().getFeature(EditorFeature.class).getArena(args[0])
+                    .flatMap(arena -> {
+                        Optional<ArenaGame> optional = arena.getArenaFeature(GameFeature.class).getGame(args[1]);
+                        if (optional.isEmpty()) {
+                            optional = arena.getArenaFeature(EditorFeature.class).getGame(args[1]);
+                        }
+                        return optional;
+                    })
+                    .map(game -> game.getEditors().keySet().stream()
                             .filter(s -> args[3].isEmpty() || s.startsWith(args[3]))
-                            .collect(Collectors.toList());
-                }
-            }
+                            .collect(Collectors.toList()))
+                    .orElse(Collections.emptyList());
         }
         return super.onTabComplete(sender, label, args);
     }

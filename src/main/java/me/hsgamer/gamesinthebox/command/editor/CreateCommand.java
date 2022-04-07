@@ -51,8 +51,8 @@ public class CreateCommand extends SubCommand {
     @Override
     public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String label, @NotNull String... args) {
         if (args.length == 1) {
-            return instance.getArenaManager().getAllArenas().stream()
-                    .map(Arena::getName)
+            return instance.getArenaManager().getFeature(EditorFeature.class).getArenaNames()
+                    .stream()
                     .filter(s -> args[0].isEmpty() || s.startsWith(args[0]))
                     .collect(Collectors.toList());
         } else if (args.length == 3) {

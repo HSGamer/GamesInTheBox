@@ -14,14 +14,25 @@ import java.util.Map;
 import java.util.Optional;
 
 public class EditorFeature extends ArenaFeature<EditorFeature.ArenaEditorFeature> {
+    private final Map<String, Arena> editingArenas = new HashMap<>();
+
     @Override
     protected ArenaEditorFeature createFeature(Arena arena) {
+        editingArenas.put(arena.getName(), arena);
         return new ArenaEditorFeature(arena);
+    }
+
+    public List<String> getArenaNames() {
+        return List.copyOf(editingArenas.keySet());
+    }
+
+    public Optional<Arena> getArena(String name) {
+        return Optional.ofNullable(editingArenas.get(name));
     }
 
     public static class ArenaEditorFeature implements Feature {
         private final Arena arena;
-        private final Map<String, ArenaGame> editingArena = new HashMap<>();
+        private final Map<String, ArenaGame> editingGames = new HashMap<>();
 
         public ArenaEditorFeature(Arena arena) {
             this.arena = arena;
@@ -29,13 +40,13 @@ public class EditorFeature extends ArenaFeature<EditorFeature.ArenaEditorFeature
 
         public EditorFeatureResponse createEditingArenaGame(String name, String type) {
             GameFeature.ArenaGameFeature gameFeature = arena.getArenaFeature(GameFeature.class);
-            if (gameFeature.isGameExist(name) || editingArena.containsKey(name)) {
+            if (gameFeature.isGameExist(name) || editingGames.containsKey(name)) {
                 return EditorFeatureResponse.GAME_EXISTED;
             }
             Optional<ArenaGame> optionalGame = ArenaGameBuilder.INSTANCE.build(type, Pair.of(arena, name));
             if (optionalGame.isPresent()) {
                 ArenaGame game = optionalGame.get();
-                editingArena.put(name, game);
+                editingGames.put(name, game);
                 game.setSetting("type", type);
                 return EditorFeatureResponse.SUCCESS;
             } else {
@@ -43,16 +54,16 @@ public class EditorFeature extends ArenaFeature<EditorFeature.ArenaEditorFeature
             }
         }
 
-        public Optional<ArenaGame> getArena(String name) {
-            ArenaGame game = editingArena.get(name);
+        public Optional<ArenaGame> getGame(String name) {
+            ArenaGame game = editingGames.get(name);
             if (game == null) {
                 game = arena.getArenaFeature(GameFeature.class).getGame(name).orElse(null);
             }
             return Optional.ofNullable(game);
         }
 
-        public List<String> getEditingArenas() {
-            return List.copyOf(editingArena.keySet());
+        public List<String> getEditingGames() {
+            return List.copyOf(editingGames.keySet());
         }
     }
 }
