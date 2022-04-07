@@ -24,7 +24,7 @@ public class EditCommand extends SubCommand {
 
     @Override
     public void onSubCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull String... args) {
-        Optional<Arena> optionalArena = instance.getArenaManager().getArenaByName(args[0]);
+        Optional<Arena> optionalArena = instance.getArenaManager().getFeature(EditorFeature.class).getArena(args[0]);
         if (optionalArena.isEmpty()) {
             MessageUtils.sendMessage(sender, instance.getMessageConfig().getArenaNotFound());
             return;
