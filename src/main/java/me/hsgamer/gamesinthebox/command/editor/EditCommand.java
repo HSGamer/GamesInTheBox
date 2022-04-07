@@ -95,7 +95,9 @@ public class EditCommand extends SubCommand {
                     game = arena.getArenaFeature(EditorFeature.class).getArena(args[1]).orElse(null);
                 }
                 if (game != null) {
-                    return List.copyOf(game.getEditors().keySet());
+                    return game.getEditors().keySet().stream()
+                            .filter(s -> args[3].isEmpty() || s.startsWith(args[3]))
+                            .collect(Collectors.toList());
                 }
             }
         }
