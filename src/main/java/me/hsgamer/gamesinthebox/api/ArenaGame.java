@@ -78,8 +78,12 @@ public abstract class ArenaGame implements Initializer {
         return containsSetting(path) || containsCommon(path);
     }
 
-    public final void set(String path, Object value) {
+    public final void setSetting(String path, Object value) {
         configFeature.set(getSettingPath(path), value);
+    }
+
+    public final void setCommon(String path, Object value) {
+        configFeature.set(getCommonPath(path), value);
     }
 
     protected Map<String, ArenaGameEditor> getAvailableEditors() {
@@ -90,12 +94,12 @@ public abstract class ArenaGame implements Initializer {
         return Collections.unmodifiableMap(editors);
     }
 
-    public EditorResponse edit(CommandSender sender, String editor, String... args) {
+    public EditorResponse edit(CommandSender sender, String editor, boolean isCommon, String... args) {
         ArenaGameEditor arenaGameEditor = editors.get(editor);
         if (arenaGameEditor == null) {
             return EditorResponse.NOT_FOUND;
         }
-        return arenaGameEditor.edit(sender, this, args);
+        return arenaGameEditor.edit(sender, this, isCommon, args);
     }
 
     public void onWaitingStart() {

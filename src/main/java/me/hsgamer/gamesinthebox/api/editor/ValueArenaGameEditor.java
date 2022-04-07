@@ -16,10 +16,16 @@ public abstract class ValueArenaGameEditor<T> implements ArenaGameEditor {
     public abstract Pair<EditorResponse, Optional<T>> convert(CommandSender sender, String[] args);
 
     @Override
-    public EditorResponse edit(CommandSender sender, ArenaGame game, String[] args) {
+    public EditorResponse edit(CommandSender sender, ArenaGame game, boolean isCommon, String[] args) {
         Pair<EditorResponse, Optional<T>> converted = convert(sender, args);
         Optional<T> value = converted.getValue();
-        value.ifPresent(t -> game.set(path, t));
+        value.ifPresent(t -> {
+            if (isCommon) {
+                game.setCommon(path, t);
+            } else {
+                game.setSetting(path, t);
+            }
+        });
         return converted.getKey();
     }
 }

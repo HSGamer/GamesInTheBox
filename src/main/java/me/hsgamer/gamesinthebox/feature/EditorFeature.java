@@ -35,7 +35,7 @@ public class EditorFeature extends ArenaFeature<EditorFeature.ArenaEditorFeature
             if (optionalGame.isPresent()) {
                 ArenaGame game = optionalGame.get();
                 editingArena.put(name, game);
-                game.set("type", type);
+                game.setSetting("type", type);
                 return EditorFeatureResponse.SUCCESS;
             } else {
                 return EditorFeatureResponse.TYPE_NOT_FOUND;
