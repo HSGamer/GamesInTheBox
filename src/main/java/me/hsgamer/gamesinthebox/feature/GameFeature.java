@@ -41,7 +41,8 @@ public class GameFeature extends ArenaFeature<GameFeature.ArenaGameFeature> {
                     game.init();
                     games.put(game.getName(), game);
                 } catch (Exception e) {
-                    Bukkit.getLogger().log(Level.WARNING, e, () -> "Failed to load game " + game.getName() + " in arena " + arena.getName());
+                    Bukkit.getLogger().log(Level.WARNING, e, () -> "Failed to load game " + game.getName() + " in arena " + arena.getName() + ". Put to edit mode.");
+                    arena.getArenaFeature(EditorFeature.class).addGame(game);
                 }
             });
         }

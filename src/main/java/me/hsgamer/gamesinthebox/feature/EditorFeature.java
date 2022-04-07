@@ -71,5 +71,9 @@ public class EditorFeature extends ArenaFeature<EditorFeature.ArenaEditorFeature
         public List<String> getEditingGames() {
             return List.copyOf(editingGames.keySet());
         }
+
+        public void addGame(ArenaGame game) {
+            editingGames.put(game.getName(), game);
+        }
     }
 }
