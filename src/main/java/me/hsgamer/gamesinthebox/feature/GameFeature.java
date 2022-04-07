@@ -76,6 +76,10 @@ public class GameFeature extends ArenaFeature<GameFeature.ArenaGameFeature> {
             return new ArrayList<>(games.keySet());
         }
 
+        public ArenaGame getGame(String name) {
+            return games.get(name);
+        }
+
         @Override
         public void clear() {
             games.values().forEach(ArenaGame::clear);
