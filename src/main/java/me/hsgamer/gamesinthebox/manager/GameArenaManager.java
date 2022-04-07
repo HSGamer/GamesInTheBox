@@ -54,6 +54,7 @@ public class GameArenaManager extends LoadedArenaManager {
 
     @Override
     public void onArenaFailToLoad(Arena arena) {
-        instance.getLogger().warning("Failed to load arena " + arena.getName());
+        instance.getLogger().warning("Failed to load arena " + arena.getName() + ". Put to edit mode.");
+        getFeature(EditorFeature.class).addArena(arena);
     }
 }

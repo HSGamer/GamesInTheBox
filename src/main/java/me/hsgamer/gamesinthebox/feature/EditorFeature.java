@@ -26,6 +26,12 @@ public class EditorFeature extends ArenaFeature<EditorFeature.ArenaEditorFeature
         return List.copyOf(editingArenas.keySet());
     }
 
+    public void addArena(Arena arena) {
+        editingArenas.put(arena.getName(), arena);
+        ArenaEditorFeature feature = getFeature(arena);
+        ArenaGameBuilder.INSTANCE.build(arena).forEach(game -> feature.editingGames.put(game.getName(), game));
+    }
+
     public Optional<Arena> getArena(String name) {
         return Optional.ofNullable(editingArenas.get(name));
     }

@@ -2,7 +2,6 @@ package me.hsgamer.gamesinthebox.feature;
 
 import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.builder.ArenaGameBuilder;
-import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import me.hsgamer.minigamecore.base.ArenaFeature;
 import me.hsgamer.minigamecore.base.Feature;
@@ -37,23 +36,12 @@ public class GameFeature extends ArenaFeature<GameFeature.ArenaGameFeature> {
 
         @Override
         public void init() {
-            arena.getArenaFeature(ConfigFeature.class).getValues("settings", false).forEach((key, value) -> {
-                if (!(value instanceof Map)) {
-                    return;
-                }
-                //noinspection unchecked
-                Map<String, Object> map = (Map<String, Object>) value;
-                if (!map.containsKey("type")) {
-                    return;
-                }
-                String type = Objects.toString(map.get("type"));
+            ArenaGameBuilder.INSTANCE.build(arena).forEach(game -> {
                 try {
-                    ArenaGameBuilder.INSTANCE.build(type, Pair.of(arena, key)).ifPresent(game -> {
-                        game.init();
-                        games.put(key, game);
-                    });
+                    game.init();
+                    games.put(game.getName(), game);
                 } catch (Exception e) {
-                    Bukkit.getLogger().log(Level.WARNING, e, () -> "Failed to load game " + key + " in arena " + arena.getName());
+                    Bukkit.getLogger().log(Level.WARNING, e, () -> "Failed to load game " + game.getName() + " in arena " + arena.getName());
                 }
             });
         }
