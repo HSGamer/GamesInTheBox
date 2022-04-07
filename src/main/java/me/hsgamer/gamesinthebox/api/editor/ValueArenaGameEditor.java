@@ -1,6 +1,9 @@
 package me.hsgamer.gamesinthebox.api.editor;
 
 import me.hsgamer.gamesinthebox.api.ArenaGame;
+import org.bukkit.command.CommandSender;
+
+import java.util.Optional;
 
 public abstract class ValueArenaGameEditor<T> implements ArenaGameEditor {
     private final String path;
@@ -9,17 +12,16 @@ public abstract class ValueArenaGameEditor<T> implements ArenaGameEditor {
         this.path = path;
     }
 
-    public abstract T convert(String value);
+    public abstract Optional<T> convert(CommandSender sender, String[] args);
 
     @Override
-    public boolean edit(ArenaGame game, String value) {
-        T converted;
-        try {
-            converted = convert(value);
-        } catch (Exception e) {
+    public boolean edit(CommandSender sender, ArenaGame game, String[] args) {
+        Optional<T> converted = convert(sender, args);
+        if (converted.isPresent()) {
+            game.set(path, converted.get());
+            return true;
+        } else {
             return false;
         }
-        game.set(path, converted);
-        return true;
     }
 }

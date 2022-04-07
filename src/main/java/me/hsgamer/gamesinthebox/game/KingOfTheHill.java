@@ -13,15 +13,19 @@ import java.util.Map;
 import java.util.UUID;
 
 public class KingOfTheHill extends BaseArenaGame {
-    private final BoundingFeature boundingFeature;
-    private final BlockParticleFeature blockParticleFeature;
-
-    private final int pointAdd;
-    private final int pointMinus;
-    private final int maxPlayersToAddPoint;
+    private BoundingFeature boundingFeature;
+    private BlockParticleFeature blockParticleFeature;
+    private int pointAdd;
+    private int pointMinus;
+    private int maxPlayersToAddPoint;
 
     public KingOfTheHill(Arena arena, String name) {
         super(arena, name);
+    }
+
+    @Override
+    public void init() {
+        super.init();
         boundingFeature = BoundingFeature.of(this, true);
         blockParticleFeature = BlockParticleFeature.of(this);
 

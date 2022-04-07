@@ -16,25 +16,16 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public abstract class BaseArenaGame extends ArenaGame {
-    protected final RewardFeature rewardFeature;
-    protected final TimerFeature timerFeature;
-    protected final PointFeature pointFeature;
+    protected RewardFeature rewardFeature;
+    protected TimerFeature timerFeature;
+    protected PointFeature pointFeature;
 
-    protected final TimeUnit timeUnit;
-    protected final long waitingTime;
-    protected final long inGameTime;
+    protected TimeUnit timeUnit;
+    protected long waitingTime;
+    protected long inGameTime;
 
     protected BaseArenaGame(Arena arena, String name) {
         super(arena, name);
-        rewardFeature = RewardFeature.of(this);
-        pointFeature = PointFeature.of(this);
-        timerFeature = arena.getArenaFeature(CooldownFeature.class);
-
-        timeUnit = Optional.ofNullable(getInstance("time.unit", TimeUnit.SECONDS.name(), String.class))
-                .flatMap(Utils::parseTimeUnit)
-                .orElse(TimeUnit.SECONDS);
-        waitingTime = getInstance("time.waiting", 30L, Number.class).longValue();
-        inGameTime = getInstance("time.in-game", 300L, Number.class).longValue();
     }
 
     @Override
@@ -50,8 +41,17 @@ public abstract class BaseArenaGame extends ArenaGame {
     @Override
     public void init() {
         super.init();
+        rewardFeature = RewardFeature.of(this);
+        pointFeature = PointFeature.of(this);
         pointFeature.init();
         rewardFeature.init();
+        timerFeature = arena.getArenaFeature(CooldownFeature.class);
+
+        timeUnit = Optional.ofNullable(getInstance("time.unit", TimeUnit.SECONDS.name(), String.class))
+                .flatMap(Utils::parseTimeUnit)
+                .orElse(TimeUnit.SECONDS);
+        waitingTime = getInstance("time.waiting", 30L, Number.class).longValue();
+        inGameTime = getInstance("time.in-game", 300L, Number.class).longValue();
     }
 
     @Override

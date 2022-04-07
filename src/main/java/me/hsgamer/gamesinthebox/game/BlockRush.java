@@ -28,21 +28,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class BlockRush extends BaseArenaGame implements Listener {
-    private final BoundingFeature boundingFeature;
-    private final BlockIterator blockIterator;
-
-    private final int point;
-
-    private final int blocksPerTick;
-    private final boolean placeOnlyOnAir;
-
     private final List<Location> blockLocations = new ArrayList<>();
-    private final ProbabilityCollection<XMaterial> materialRandomness;
     private final AtomicBoolean isWorking = new AtomicBoolean(false);
     private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
+    private BoundingFeature boundingFeature;
+    private BlockIterator blockIterator;
+    private int point;
+    private int blocksPerTick;
+    private boolean placeOnlyOnAir;
+    private ProbabilityCollection<XMaterial> materialRandomness;
 
     public BlockRush(Arena arena, String name) {
         super(arena, name);
+    }
+
+    @Override
+    public void init() {
+        super.init();
         boundingFeature = BoundingFeature.of(this, false);
         blockIterator = BlockIteratorUtil.get(getString("bounding-iterator", "default"), boundingFeature.getBlockBox());
 

@@ -28,21 +28,24 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Pinata extends BaseArenaGame implements Listener {
-    private final BoundingFeature boundingFeature;
-    private final ParticleDisplay particleDisplay;
-
-    private final Location spawnLocation;
-    private final EntityType entityType;
-    private final double pinataSpeed;
-    private final int maxNoDamageTicks;
-    private final boolean babyEntity;
-    private final boolean glowing;
-
     private final AtomicReference<LivingEntity> currentPinata = new AtomicReference<>();
     private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
+    private BoundingFeature boundingFeature;
+    private ParticleDisplay particleDisplay;
+    private Location spawnLocation;
+    private EntityType entityType;
+    private double pinataSpeed;
+    private int maxNoDamageTicks;
+    private boolean babyEntity;
+    private boolean glowing;
 
     public Pinata(Arena arena, String name) {
         super(arena, name);
+    }
+
+    @Override
+    public void init() {
+        super.init();
         boundingFeature = BoundingFeature.of(this, true);
         spawnLocation = Objects.requireNonNull(LocationUtils.getLocation(getString("spawn-location", "")), "spawn-location is null");
         particleDisplay = ParticleDisplay.fromConfig(Utils.createSection(getValues("particle", false)));

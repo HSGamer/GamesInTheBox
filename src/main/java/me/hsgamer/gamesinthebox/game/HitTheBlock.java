@@ -29,20 +29,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HitTheBlock extends BaseArenaGame implements Listener {
-    private final BoundingFeature boundingFeature;
-
-    private final int maxBlock;
-    private final ProbabilityCollection<XMaterial> materialRandomness;
-    private final Map<XMaterial, Integer> materialScoreMap;
-    private final int defaultPoint;
-    private final boolean removeProjectileOnHit;
-
     private final Map<Location, Integer> spawnBlocks = new HashMap<>();
     private final AtomicBoolean isWorking = new AtomicBoolean(false);
     private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
+    private BoundingFeature boundingFeature;
+    private int maxBlock;
+    private ProbabilityCollection<XMaterial> materialRandomness;
+    private Map<XMaterial, Integer> materialScoreMap;
+    private int defaultPoint;
+    private boolean removeProjectileOnHit;
 
     public HitTheBlock(Arena arena, String name) {
         super(arena, name);
+    }
+
+    @Override
+    public void init() {
+        super.init();
         boundingFeature = BoundingFeature.of(this, false);
         maxBlock = getInstance("max-block", 10, Number.class).intValue();
         materialRandomness = Utils.parseMaterialProbability(getValues("material", false));

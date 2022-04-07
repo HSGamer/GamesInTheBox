@@ -24,17 +24,20 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ShootTheBat extends BaseArenaGame implements Listener {
-    private final BoundingFeature boundingFeature;
-
-    private final BoundingFeature.VectorOffsetSetting vectorOffsetSetting;
-    private final int point;
-    private final int maxSpawn;
-
     private final Queue<LivingEntity> spawnedBats = new LinkedList<>();
     private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
+    private BoundingFeature boundingFeature;
+    private BoundingFeature.VectorOffsetSetting vectorOffsetSetting;
+    private int point;
+    private int maxSpawn;
 
     public ShootTheBat(Arena arena, String name) {
         super(arena, name);
+    }
+
+    @Override
+    public void init() {
+        super.init();
         boundingFeature = BoundingFeature.of(this, true);
         vectorOffsetSetting = BoundingFeature.VectorOffsetSetting.of(this, "spawn-offset");
         point = getInstance("point", 1, Number.class).intValue();
