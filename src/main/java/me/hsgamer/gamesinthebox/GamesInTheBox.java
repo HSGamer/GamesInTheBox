@@ -2,6 +2,7 @@ package me.hsgamer.gamesinthebox;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.hsgamer.gamesinthebox.command.AdminCommand;
+import me.hsgamer.gamesinthebox.command.EditorCommand;
 import me.hsgamer.gamesinthebox.config.MainConfig;
 import me.hsgamer.gamesinthebox.config.MessageConfig;
 import me.hsgamer.gamesinthebox.manager.GameArenaManager;
@@ -35,6 +36,7 @@ public final class GamesInTheBox extends BasePlugin {
         arenaManager.init();
         arenaManager.postInit();
         registerCommand(new AdminCommand(this));
+        registerCommand(new EditorCommand(this));
     }
 
     @Override

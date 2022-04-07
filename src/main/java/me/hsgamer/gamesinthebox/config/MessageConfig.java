@@ -79,6 +79,36 @@ public interface MessageConfig {
         return "&7Ending game...";
     }
 
+    @ConfigPath("editor.not-found")
+    default String getEditorNotFound() {
+        return "&cEditor not found!";
+    }
+
+    @ConfigPath("editor.invalid-format")
+    default String getEditorInvalidFormat() {
+        return "&cInvalid format!";
+    }
+
+    @ConfigPath("editor.player-only")
+    default String getEditorPlayerOnly() {
+        return "&cThis editor can only be used by players!";
+    }
+
+    @ConfigPath("editor.failed")
+    default String getEditorFailed() {
+        return "&cFailed!";
+    }
+
+    @ConfigPath("editor.game-existed")
+    default String getEditorGameExisted() {
+        return "&cThe game already existed!";
+    }
+
+    @ConfigPath("editor.type-not-found")
+    default String getEditorTypeNotFound() {
+        return "&cThe game type is not found!";
+    }
+
     //region KOTH
     @ConfigPath("koth.name")
     default String getKOTHDisplayName() {

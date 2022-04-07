@@ -9,6 +9,7 @@ import me.hsgamer.minigamecore.base.ArenaFeature;
 import me.hsgamer.minigamecore.base.Feature;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,9 +46,13 @@ public class EditorFeature extends ArenaFeature<EditorFeature.ArenaEditorFeature
         public Optional<ArenaGame> getArena(String name) {
             ArenaGame game = editingArena.get(name);
             if (game == null) {
-                game = arena.getArenaFeature(GameFeature.class).getGame(name);
+                game = arena.getArenaFeature(GameFeature.class).getGame(name).orElse(null);
             }
             return Optional.ofNullable(game);
+        }
+
+        public List<String> getEditingArenas() {
+            return List.copyOf(editingArena.keySet());
         }
     }
 }

@@ -76,8 +76,8 @@ public class GameFeature extends ArenaFeature<GameFeature.ArenaGameFeature> {
             return new ArrayList<>(games.keySet());
         }
 
-        public ArenaGame getGame(String name) {
-            return games.get(name);
+        public Optional<ArenaGame> getGame(String name) {
+            return Optional.ofNullable(games.get(name));
         }
 
         @Override
