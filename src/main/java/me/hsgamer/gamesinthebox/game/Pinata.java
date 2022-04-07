@@ -2,6 +2,8 @@ package me.hsgamer.gamesinthebox.game;
 
 import com.cryptomorin.xseries.particles.ParticleDisplay;
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
+import me.hsgamer.gamesinthebox.api.editor.ArenaGameEditor;
+import me.hsgamer.gamesinthebox.api.editor.Editors;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.util.LocationUtils;
 import me.hsgamer.gamesinthebox.util.Utils;
@@ -23,7 +25,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -54,6 +58,19 @@ public class Pinata extends BaseArenaGame implements Listener {
         entityType = Utils.tryGetLivingEntityType(getString("pinata.type", "SHEEP"), EntityType.SHEEP);
         babyEntity = getInstance("pinata.baby", false, Boolean.class);
         glowing = getInstance("pinata.glowing", false, Boolean.class);
+    }
+
+    @Override
+    protected Map<String, ArenaGameEditor> getAdditionalEditors() {
+        Map<String, ArenaGameEditor> map = new HashMap<>();
+        map.put("spawnLocation", Editors.ofCurrentPosition("spawn-location", true, false));
+        map.put("pinataSpeed", Editors.ofNumber("pinata.speed"));
+        map.put("pinataMaxNoDamageTicks", Editors.ofNumber("pinata.max-no-damage-ticks"));
+        map.put("pinataType", Editors.ofString("pinata.type"));
+        map.put("pinataBaby", Editors.ofBoolean("pinata.baby"));
+        map.put("pinataGlowing", Editors.ofBoolean("pinata.glowing"));
+        map.putAll(BoundingFeature.getDefaultSettings());
+        return map;
     }
 
     private LivingEntity spawnPinata() {

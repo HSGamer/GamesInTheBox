@@ -2,6 +2,8 @@ package me.hsgamer.gamesinthebox.feature.game;
 
 import me.hsgamer.blockutil.extra.box.BlockBox;
 import me.hsgamer.gamesinthebox.api.ArenaGame;
+import me.hsgamer.gamesinthebox.api.editor.ArenaGameEditor;
+import me.hsgamer.gamesinthebox.api.editor.Editors;
 import me.hsgamer.gamesinthebox.util.LocationUtils;
 import me.hsgamer.minigamecore.base.Feature;
 import org.bukkit.Bukkit;
@@ -9,6 +11,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -40,6 +44,14 @@ public class BoundingFeature implements Feature {
 
     public static BoundingFeature of(ArenaGame arenaGame, boolean maxInclusive) {
         return of(arenaGame, "world", "pos1", "pos2", maxInclusive);
+    }
+
+    public static Map<String, ArenaGameEditor> getDefaultSettings() {
+        Map<String, ArenaGameEditor> map = new HashMap<>();
+        map.put("world", Editors.ofString("world"));
+        map.put("pos1", Editors.ofLookingBlock("pos1", false));
+        map.put("pos2", Editors.ofLookingBlock("pos2", false));
+        return map;
     }
 
     public boolean checkBounding(UUID uuid) {
@@ -106,6 +118,17 @@ public class BoundingFeature implements Feature {
                     arenaGame.getInstance(path + ".min-z", 0, Number.class).intValue(),
                     arenaGame.getInstance(path + ".max-z", 0, Number.class).intValue()
             );
+        }
+
+        public static Map<String, ArenaGameEditor> getSettings(String name, String path) {
+            Map<String, ArenaGameEditor> settings = new HashMap<>();
+            settings.put(name + ".minX", Editors.ofNumber(path + ".min-x"));
+            settings.put(name + ".maxX", Editors.ofNumber(path + ".max-x"));
+            settings.put(name + ".minY", Editors.ofNumber(path + ".min-y"));
+            settings.put(name + ".maxY", Editors.ofNumber(path + ".max-y"));
+            settings.put(name + ".minZ", Editors.ofNumber(path + ".min-z"));
+            settings.put(name + ".maxZ", Editors.ofNumber(path + ".max-z"));
+            return settings;
         }
     }
 }

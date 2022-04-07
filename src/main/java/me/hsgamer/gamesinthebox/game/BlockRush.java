@@ -7,6 +7,8 @@ import me.hsgamer.blockutil.api.BlockUtil;
 import me.hsgamer.blockutil.extra.iterator.BlockIteratorUtil;
 import me.hsgamer.blockutil.extra.iterator.api.BlockIterator;
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
+import me.hsgamer.gamesinthebox.api.editor.ArenaGameEditor;
+import me.hsgamer.gamesinthebox.api.editor.Editors;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.state.InGameState;
 import me.hsgamer.gamesinthebox.util.Utils;
@@ -57,6 +59,18 @@ public class BlockRush extends BaseArenaGame implements Listener {
         if (materialRandomness.isEmpty()) {
             materialRandomness.add(XMaterial.STONE, 1);
         }
+    }
+
+    @Override
+    protected Map<String, ArenaGameEditor> getAdditionalEditors() {
+        Map<String, ArenaGameEditor> map = new HashMap<>();
+        map.put("boundingIterator", Editors.ofString("bounding-iterator"));
+        map.put("point", Editors.ofNumber("point"));
+        map.put("blocksPerTick", Editors.ofNumber("blocks-per-tick"));
+        map.put("placeOnlyOnAir", Editors.ofBoolean("place-only-on-air"));
+        map.put("material", Editors.ofMap("material", " "));
+        map.putAll(BoundingFeature.getDefaultSettings());
+        return map;
     }
 
     @Override

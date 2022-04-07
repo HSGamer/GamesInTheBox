@@ -1,11 +1,14 @@
 package me.hsgamer.gamesinthebox.api;
 
 import me.hsgamer.gamesinthebox.GamesInTheBox;
+import me.hsgamer.gamesinthebox.api.editor.ArenaGameEditor;
+import me.hsgamer.gamesinthebox.api.editor.EditorResponse;
 import me.hsgamer.gamesinthebox.feature.ConfigFeature;
 import me.hsgamer.hscore.common.CollectionUtils;
 import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
 import me.hsgamer.minigamecore.base.Initializer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -15,12 +18,14 @@ public abstract class ArenaGame implements Initializer {
     protected final ConfigFeature.ArenaConfigFeature configFeature;
     protected final GamesInTheBox instance;
     protected final String name;
+    protected final Map<String, ArenaGameEditor> editors;
 
     protected ArenaGame(Arena arena, String name) {
         this.arena = arena;
         this.configFeature = arena.getArenaFeature(ConfigFeature.class);
         this.name = name;
         this.instance = JavaPlugin.getPlugin(GamesInTheBox.class);
+        this.editors = getAvailableEditors();
     }
 
     public final String getName() {
@@ -75,6 +80,22 @@ public abstract class ArenaGame implements Initializer {
 
     public final void set(String path, Object value) {
         configFeature.set(getSettingPath(path), value);
+    }
+
+    protected Map<String, ArenaGameEditor> getAvailableEditors() {
+        return Collections.emptyMap();
+    }
+
+    public Map<String, ArenaGameEditor> getEditors() {
+        return Collections.unmodifiableMap(editors);
+    }
+
+    public EditorResponse edit(CommandSender sender, String editor, String... args) {
+        ArenaGameEditor arenaGameEditor = editors.get(editor);
+        if (arenaGameEditor == null) {
+            return EditorResponse.NOT_FOUND;
+        }
+        return arenaGameEditor.edit(sender, this, args);
     }
 
     public void onWaitingStart() {

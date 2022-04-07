@@ -1,5 +1,7 @@
 package me.hsgamer.gamesinthebox.api;
 
+import me.hsgamer.gamesinthebox.api.editor.ArenaGameEditor;
+import me.hsgamer.gamesinthebox.api.editor.Editors;
 import me.hsgamer.gamesinthebox.feature.CooldownFeature;
 import me.hsgamer.gamesinthebox.feature.game.PointFeature;
 import me.hsgamer.gamesinthebox.feature.game.RewardFeature;
@@ -10,9 +12,7 @@ import me.hsgamer.minigamecore.base.Arena;
 import me.hsgamer.minigamecore.implementation.feature.single.TimerFeature;
 import org.bukkit.Bukkit;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public abstract class BaseArenaGame extends ArenaGame {
@@ -64,6 +64,22 @@ public abstract class BaseArenaGame extends ArenaGame {
     protected abstract String getStartBroadcast();
 
     protected abstract String getEndBroadcast();
+
+    protected Map<String, ArenaGameEditor> getAdditionalEditors() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    protected final Map<String, ArenaGameEditor> getAvailableEditors() {
+        Map<String, ArenaGameEditor> map = new HashMap<>();
+        map.put("waitingTime", Editors.ofNumber("time.waiting"));
+        map.put("inGameTime", Editors.ofNumber("time.in-game"));
+        map.put("timeUnit", Editors.ofTimeUnit("time.unit"));
+        map.put("reward", Editors.ofList("reward", "|"));
+        map.put("minPlayersToReward", Editors.ofNumber("min-players-to-reward"));
+        map.putAll(getAdditionalEditors());
+        return map;
+    }
 
     @Override
     public void onWaitingStart() {

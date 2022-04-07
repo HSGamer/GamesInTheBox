@@ -1,6 +1,8 @@
 package me.hsgamer.gamesinthebox.game;
 
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
+import me.hsgamer.gamesinthebox.api.editor.ArenaGameEditor;
+import me.hsgamer.gamesinthebox.api.editor.Editors;
 import me.hsgamer.gamesinthebox.feature.game.BlockParticleFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.minigamecore.base.Arena;
@@ -11,6 +13,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +35,15 @@ public class FreeForAll extends BaseArenaGame implements Listener {
 
         pointAdd = getInstance("point.add", 5, Number.class).intValue();
         pointMinus = getInstance("point.minus", 1, Number.class).intValue();
+    }
+
+    @Override
+    protected Map<String, ArenaGameEditor> getAdditionalEditors() {
+        Map<String, ArenaGameEditor> map = new HashMap<>();
+        map.put("pointAdd", Editors.ofNumber("point.add"));
+        map.put("pointMinus", Editors.ofNumber("point.minus"));
+        map.putAll(BoundingFeature.getDefaultSettings());
+        return map;
     }
 
     @Override

@@ -4,6 +4,8 @@ import com.cryptomorin.xseries.XMaterial;
 import com.lewdev.probabilitylib.ProbabilityCollection;
 import me.hsgamer.blockutil.api.BlockUtil;
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
+import me.hsgamer.gamesinthebox.api.editor.ArenaGameEditor;
+import me.hsgamer.gamesinthebox.api.editor.Editors;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.hscore.common.Pair;
@@ -56,6 +58,18 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
         if (materialRandomness.isEmpty()) {
             materialRandomness.add(XMaterial.STONE, 1);
         }
+    }
+
+    @Override
+    protected Map<String, ArenaGameEditor> getAdditionalEditors() {
+        Map<String, ArenaGameEditor> map = new HashMap<>();
+        map.put("maxBlock", Editors.ofNumber("max-block"));
+        map.put("material", Editors.ofMap("material", " "));
+        map.put("materialScore", Editors.ofMap("material-score", " "));
+        map.put("defaultPoint", Editors.ofNumber("default-point"));
+        map.put("removeProjectileOnHit", Editors.ofBoolean("remove-projectile-on-hit"));
+        map.putAll(BoundingFeature.getDefaultSettings());
+        return map;
     }
 
     private Pair<Location, XMaterial> spawnNewLocation() {

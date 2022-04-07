@@ -1,6 +1,8 @@
 package me.hsgamer.gamesinthebox.game;
 
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
+import me.hsgamer.gamesinthebox.api.editor.ArenaGameEditor;
+import me.hsgamer.gamesinthebox.api.editor.Editors;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.minigamecore.base.Arena;
@@ -17,10 +19,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ShootTheBat extends BaseArenaGame implements Listener {
@@ -42,6 +41,16 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
         vectorOffsetSetting = BoundingFeature.VectorOffsetSetting.of(this, "spawn-offset");
         point = getInstance("point", 1, Number.class).intValue();
         maxSpawn = getInstance("max-spawn", 10, Number.class).intValue();
+    }
+
+    @Override
+    protected Map<String, ArenaGameEditor> getAdditionalEditors() {
+        Map<String, ArenaGameEditor> map = new HashMap<>();
+        map.put("point", Editors.ofNumber("point"));
+        map.put("maxSpawn", Editors.ofNumber("maxSpawn"));
+        map.putAll(BoundingFeature.getDefaultSettings());
+        map.putAll(BoundingFeature.VectorOffsetSetting.getSettings("spawnOffset", "spawn-offset"));
+        return map;
     }
 
     private LivingEntity spawnBat() {

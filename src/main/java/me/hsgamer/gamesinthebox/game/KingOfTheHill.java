@@ -1,16 +1,15 @@
 package me.hsgamer.gamesinthebox.game;
 
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
+import me.hsgamer.gamesinthebox.api.editor.ArenaGameEditor;
+import me.hsgamer.gamesinthebox.api.editor.Editors;
 import me.hsgamer.gamesinthebox.feature.game.BlockParticleFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class KingOfTheHill extends BaseArenaGame {
     private BoundingFeature boundingFeature;
@@ -32,6 +31,16 @@ public class KingOfTheHill extends BaseArenaGame {
         pointAdd = getInstance("point.add", 5, Number.class).intValue();
         pointMinus = getInstance("point.minus", 1, Number.class).intValue();
         maxPlayersToAddPoint = getInstance("point.max-players-to-add", -1, Number.class).intValue();
+    }
+
+    @Override
+    protected Map<String, ArenaGameEditor> getAdditionalEditors() {
+        Map<String, ArenaGameEditor> map = new HashMap<>();
+        map.put("pointAdd", Editors.ofNumber("point.add"));
+        map.put("pointMinus", Editors.ofNumber("point.minus"));
+        map.put("maxPlayersToAddPoint", Editors.ofNumber("point.max-players-to-add"));
+        map.putAll(BoundingFeature.getDefaultSettings());
+        return map;
     }
 
     @Override
