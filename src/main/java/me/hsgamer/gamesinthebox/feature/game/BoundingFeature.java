@@ -48,7 +48,7 @@ public class BoundingFeature implements Feature {
 
     public static Map<String, ArenaGameEditor> getDefaultSettings() {
         Map<String, ArenaGameEditor> map = new HashMap<>();
-        map.put("world", Editors.ofString("world"));
+        map.put("world", Editors.ofWorld("world"));
         map.put("pos1", Editors.ofLookingBlock("pos1", false));
         map.put("pos2", Editors.ofLookingBlock("pos2", false));
         return map;

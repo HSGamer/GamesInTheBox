@@ -109,4 +109,18 @@ public final class Editors {
             return Pair.of(EditorResponse.SUCCESS, Optional.of(Arrays.asList(split)));
         });
     }
+
+    public static SimpleValueArenaGameEditor<String> ofWorld(String path) {
+        return new SimpleValueArenaGameEditor<>(path, (sender, args) -> {
+            if (args.length == 0) {
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    return Pair.of(EditorResponse.SUCCESS, Optional.of(player.getWorld().getName()));
+                } else {
+                    return Pair.of(EditorResponse.PLAYER_ONLY, Optional.empty());
+                }
+            }
+            return Pair.of(EditorResponse.SUCCESS, Optional.of(args[0]));
+        });
+    }
 }
