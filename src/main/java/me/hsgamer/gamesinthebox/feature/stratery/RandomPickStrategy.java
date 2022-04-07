@@ -3,6 +3,7 @@ package me.hsgamer.gamesinthebox.feature.stratery;
 import com.lewdev.probabilitylib.ProbabilityCollection;
 import me.hsgamer.gamesinthebox.feature.ConfigFeature;
 import me.hsgamer.gamesinthebox.feature.GameFeature;
+import me.hsgamer.hscore.common.CollectionUtils;
 import me.hsgamer.minigamecore.base.Arena;
 
 import java.util.Objects;
@@ -37,15 +38,19 @@ public class RandomPickStrategy extends CollectionPickStrategy {
     @Override
     public String pickFromCollection() {
         String game;
-        long tryTime = 0;
         GameFeature.ArenaGameFeature gameFeature = arena.getArenaFeature(GameFeature.class);
-        do {
-            game = probabilityCollection.get();
-            if (!gameFeature.isGameExist(game)) {
-                game = null;
-                tryTime++;
-            }
-        } while (game == null && tryTime < 10);
+        if (!probabilityCollection.isEmpty()) {
+            long tryTime = 0;
+            do {
+                game = probabilityCollection.get();
+                if (!gameFeature.isGameExist(game)) {
+                    game = null;
+                    tryTime++;
+                }
+            } while (game == null && tryTime < 10);
+        } else {
+            game = CollectionUtils.pickRandom(gameFeature.getAvailableGames());
+        }
         return game;
     }
 }

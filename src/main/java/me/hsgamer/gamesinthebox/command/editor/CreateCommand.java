@@ -23,7 +23,11 @@ public class CreateCommand extends SubCommand {
 
     @Override
     public void onSubCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull String... args) {
-        Arena arena = instance.getArenaManager().getArenaByName(args[0]).orElseGet(() -> new Arena(args[0], instance.getArenaManager()));
+        Arena arena = instance.getArenaManager().getArenaByName(args[0]).orElseGet(() -> {
+            Arena newArena = new Arena(args[0], instance.getArenaManager());
+            instance.getArenaConfig().set(args[0] + ".pick-strategy", "random");
+            return newArena;
+        });
         EditorFeature.ArenaEditorFeature editorFeature = arena.getArenaFeature(EditorFeature.class);
         EditorFeatureResponse response = editorFeature.createEditingArenaGame(args[1], args[2]);
         switch (response) {
