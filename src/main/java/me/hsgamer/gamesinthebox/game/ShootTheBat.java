@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ShootTheBat extends BaseArenaGame implements Listener {
-    private final Queue<LivingEntity> spawnedBats = new LinkedList<>();
+    private final Queue<Bat> spawnedBats = new LinkedList<>();
     private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
     private BoundingFeature boundingFeature;
     private BoundingFeature.VectorOffsetSetting vectorOffsetSetting;
@@ -53,7 +53,7 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
         return map;
     }
 
-    private LivingEntity spawnBat() {
+    private Bat spawnBat() {
         Location location = boundingFeature.getRandomLocation(vectorOffsetSetting);
         World world = location.getWorld();
         assert world != null;
@@ -70,10 +70,13 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
         return new BukkitRunnable() {
             @Override
             public void run() {
-                LivingEntity currentBat = spawnedBats.poll();
+                Bat currentBat = spawnedBats.poll();
                 if (currentBat != null) {
                     if (currentBat.isValid() && boundingFeature.checkBounding(currentBat.getLocation())) {
                         spawnedBats.add(currentBat);
+                        if (!currentBat.isAwake()) {
+                            currentBat.setAwake(true);
+                        }
                     } else {
                         Utils.despawnSafe(currentBat);
                     }
@@ -89,6 +92,7 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBatDeath(EntityDeathEvent event) {
         LivingEntity entity = event.getEntity();
+        if (!(entity instanceof Bat)) return;
         if (!spawnedBats.remove(entity)) return;
 
         Player player = entity.getKiller();
