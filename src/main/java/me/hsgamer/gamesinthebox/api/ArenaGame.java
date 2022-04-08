@@ -158,6 +158,26 @@ public abstract class ArenaGame implements Initializer {
         return description;
     }
 
+    public List<String> getAdditionalAboveDescription() {
+        List<String> description;
+        if (containsSetting("above-description")) {
+            description = CollectionUtils.createStringListFromObject(get("additional-above-description"), false);
+        } else {
+            description = Collections.emptyList();
+        }
+        return description;
+    }
+
+    public List<String> getAdditionalBelowDescription() {
+        List<String> description;
+        if (containsSetting("below-description")) {
+            description = CollectionUtils.createStringListFromObject(get("below-description"), false);
+        } else {
+            description = Collections.emptyList();
+        }
+        return description;
+    }
+
     public final String replace(String str) {
         Map<String, Object> replace = getReplaceable();
         for (Map.Entry<String, Object> entry : replace.entrySet()) {

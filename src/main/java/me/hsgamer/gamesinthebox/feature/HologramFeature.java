@@ -104,10 +104,15 @@ public class HologramFeature extends ArenaFeature<HologramFeature.ArenaHologramF
 
             List<String> description = game.getDescription();
             List<String> topDescription = game.getTopDescription();
+            List<String> aboveDescription = game.getAdditionalAboveDescription();
+            List<String> belowDescription = game.getAdditionalBelowDescription();
 
             holograms.forEach(pair -> {
                 Hologram hologram = pair.getKey();
-                List<String> texts = pair.getValue();
+                List<String> texts = new ArrayList<>();
+                texts.addAll(aboveDescription);
+                texts.addAll(pair.getValue());
+                texts.addAll(belowDescription);
                 List<String> newTexts = new ArrayList<>();
                 for (String text : texts) {
                     if (text.equalsIgnoreCase("{description}")) {
