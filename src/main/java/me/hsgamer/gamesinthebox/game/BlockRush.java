@@ -17,11 +17,16 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -109,6 +114,43 @@ public class BlockRush extends BaseArenaGame implements Listener {
             blockLocations.remove(location);
         } else {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlocExplode(BlockExplodeEvent event) {
+        if (arena.getState() == InGameState.class) {
+            for (Block block : event.blockList()) {
+                blockLocations.remove(block.getLocation());
+            }
+        } else {
+            event.blockList().removeIf(block -> blockLocations.contains(block.getLocation()));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityExplode(EntityExplodeEvent event) {
+        if (arena.getState() != InGameState.class) {
+            event.blockList().removeIf(block -> blockLocations.contains(block.getLocation()));
+            return;
+        }
+
+        Entity entity = event.getEntity();
+        Entity source;
+        do {
+            source = entity instanceof TNTPrimed ? ((TNTPrimed) entity).getSource() : null;
+            entity = source;
+        } while (source instanceof TNTPrimed);
+
+        int count = 0;
+        for (Block block : event.blockList()) {
+            if (blockLocations.remove(block.getLocation())) {
+                count++;
+            }
+        }
+
+        if (count > 0 && source instanceof Player) {
+            pointFeature.applyPoint(source.getUniqueId(), point * count);
         }
     }
 
