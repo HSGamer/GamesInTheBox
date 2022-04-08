@@ -40,7 +40,7 @@ public class GameArenaManager extends LoadedArenaManager {
                 new CooldownFeature(instance),
                 new HologramFeature(instance),
                 new TopFeature(instance),
-                new EditorFeature()
+                new EditorFeature(instance)
         );
     }
 
@@ -55,6 +55,6 @@ public class GameArenaManager extends LoadedArenaManager {
     @Override
     public void onArenaFailToLoad(Arena arena) {
         instance.getLogger().warning("Failed to load arena " + arena.getName() + ". Put to edit mode.");
-        getFeature(EditorFeature.class).addArena(arena);
+        getFeature(EditorFeature.class).addArena(arena, true);
     }
 }

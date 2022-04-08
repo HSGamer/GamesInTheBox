@@ -1,5 +1,6 @@
 package me.hsgamer.gamesinthebox.feature;
 
+import me.hsgamer.gamesinthebox.GamesInTheBox;
 import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.api.editor.EditorFeatureResponse;
 import me.hsgamer.gamesinthebox.builder.ArenaGameBuilder;
@@ -14,7 +15,12 @@ import java.util.Map;
 import java.util.Optional;
 
 public class EditorFeature extends ArenaFeature<EditorFeature.ArenaEditorFeature> {
+    private final GamesInTheBox instance;
     private final Map<String, Arena> editingArenas = new HashMap<>();
+
+    public EditorFeature(GamesInTheBox instance) {
+        this.instance = instance;
+    }
 
     @Override
     protected ArenaEditorFeature createFeature(Arena arena) {
@@ -22,14 +28,21 @@ public class EditorFeature extends ArenaFeature<EditorFeature.ArenaEditorFeature
         return new ArenaEditorFeature(arena);
     }
 
+    @Override
+    public void postInit() {
+        instance.getArenaManager().getAllArenas().forEach(arena -> addArena(arena, false));
+    }
+
     public List<String> getArenaNames() {
         return List.copyOf(editingArenas.keySet());
     }
 
-    public void addArena(Arena arena) {
+    public void addArena(Arena arena, boolean includeEditingGames) {
         editingArenas.put(arena.getName(), arena);
-        ArenaEditorFeature feature = getFeature(arena);
-        ArenaGameBuilder.INSTANCE.build(arena).forEach(game -> feature.editingGames.put(game.getName(), game));
+        if (includeEditingGames) {
+            ArenaEditorFeature feature = getFeature(arena);
+            ArenaGameBuilder.INSTANCE.build(arena).forEach(game -> feature.editingGames.put(game.getName(), game));
+        }
     }
 
     public Optional<Arena> getArena(String name) {
