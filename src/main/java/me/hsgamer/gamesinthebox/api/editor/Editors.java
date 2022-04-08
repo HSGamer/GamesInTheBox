@@ -46,13 +46,13 @@ public final class Editors {
         });
     }
 
-    public static SimpleValueArenaGameEditor<TimeUnit> ofTimeUnit(String path) {
+    public static SimpleValueArenaGameEditor<String> ofTimeUnit(String path) {
         return new SimpleValueArenaGameEditor<>(path, args -> {
             if (args.length == 0) {
                 return Pair.of(EditorResponse.INVALID_FORMAT, Optional.empty());
             }
             try {
-                return Pair.of(EditorResponse.SUCCESS, Optional.of(TimeUnit.valueOf(args[0].toUpperCase(Locale.ROOT))));
+                return Pair.of(EditorResponse.SUCCESS, Optional.of(TimeUnit.valueOf(args[0].toUpperCase(Locale.ROOT)).name()));
             } catch (NumberFormatException e) {
                 return Pair.of(EditorResponse.INVALID_FORMAT, Optional.empty());
             }
