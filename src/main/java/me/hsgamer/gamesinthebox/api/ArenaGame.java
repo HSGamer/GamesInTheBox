@@ -161,7 +161,7 @@ public abstract class ArenaGame implements Initializer {
     public List<String> getAdditionalAboveDescription() {
         List<String> description;
         if (containsSetting("above-description")) {
-            description = CollectionUtils.createStringListFromObject(get("additional-above-description"), false);
+            description = CollectionUtils.createStringListFromObject(get("above-description"), false);
         } else {
             description = Collections.emptyList();
         }
