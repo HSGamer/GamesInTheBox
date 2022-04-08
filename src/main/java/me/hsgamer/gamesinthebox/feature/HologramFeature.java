@@ -104,17 +104,24 @@ public class HologramFeature extends ArenaFeature<HologramFeature.ArenaHologramF
 
             List<String> description = game.getDescription();
             List<String> topDescription = game.getTopDescription();
-            List<String> aboveDescription = game.getAdditionalAboveDescription();
-            List<String> belowDescription = game.getAdditionalBelowDescription();
+            Map<String, List<String>> additionalDescription = game.getAdditionalDescription();
 
             holograms.forEach(pair -> {
                 Hologram hologram = pair.getKey();
-                List<String> texts = new ArrayList<>();
-                texts.addAll(aboveDescription);
-                texts.addAll(pair.getValue());
-                texts.addAll(belowDescription);
+                List<String> finalTexts = new ArrayList<>();
+                for (String text : pair.getValue()) {
+                    if (text.startsWith("{") && text.endsWith("}")) {
+                        String key = text.substring(1, text.length() - 1);
+                        if (additionalDescription.containsKey(key)) {
+                            finalTexts.addAll(additionalDescription.get(key));
+                            continue;
+                        }
+                    }
+                    finalTexts.add(text);
+                }
+
                 List<String> newTexts = new ArrayList<>();
-                for (String text : texts) {
+                for (String text : finalTexts) {
                     if (text.equalsIgnoreCase("{description}")) {
                         newTexts.addAll(description);
                     } else if (text.equalsIgnoreCase("{top-description}")) {
@@ -123,6 +130,7 @@ public class HologramFeature extends ArenaFeature<HologramFeature.ArenaHologramF
                         newTexts.add(text);
                     }
                 }
+
                 newTexts.replaceAll(game::replace);
                 newTexts.replaceAll(MessageUtils::colorize);
                 hologram.setLines(newTexts);

@@ -158,22 +158,13 @@ public abstract class ArenaGame implements Initializer {
         return description;
     }
 
-    public List<String> getAdditionalAboveDescription() {
-        List<String> description;
-        if (containsSetting("above-description")) {
-            description = CollectionUtils.createStringListFromObject(get("above-description"), false);
-        } else {
-            description = Collections.emptyList();
-        }
-        return description;
-    }
-
-    public List<String> getAdditionalBelowDescription() {
-        List<String> description;
-        if (containsSetting("below-description")) {
-            description = CollectionUtils.createStringListFromObject(get("below-description"), false);
-        } else {
-            description = Collections.emptyList();
+    public Map<String, List<String>> getAdditionalDescription() {
+        Map<String, List<String>> description = new HashMap<>();
+        if (containsSetting("additional-description")) {
+            getValues("additional-description", false).forEach((key, value) -> {
+                List<String> list = CollectionUtils.createStringListFromObject(value, false);
+                description.put(key, list);
+            });
         }
         return description;
     }
