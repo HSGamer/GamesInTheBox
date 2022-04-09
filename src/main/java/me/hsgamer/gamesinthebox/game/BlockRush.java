@@ -171,6 +171,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
                             XMaterial xMaterial = materialRandomness.get();
                             Material material = Optional.ofNullable(xMaterial.parseMaterial()).orElse(Material.STONE);
                             BlockUtil.getHandler().setBlock(block, material, xMaterial.getData(), false, true);
+                            BlockUtil.updateLight(block);
                             blockLocations.add(block.getLocation());
                             chunks.add(block.getChunk());
                         }
@@ -206,6 +207,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
                     if (iterator.hasNext()) {
                         Block block = iterator.next().getBlock();
                         BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, false);
+                        BlockUtil.updateLight(block);
                         chunks.add(block.getChunk());
                     } else {
                         cancel();
