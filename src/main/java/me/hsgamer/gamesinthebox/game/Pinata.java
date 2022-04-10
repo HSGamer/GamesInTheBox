@@ -76,10 +76,10 @@ public class Pinata extends BaseArenaGame implements Listener {
     private LivingEntity spawnPinata() {
         World world = spawnLocation.getWorld();
         assert world != null;
+        if (!world.getChunkAt(spawnLocation).isLoaded()) return null;
         LivingEntity pinata = (LivingEntity) world.spawnEntity(spawnLocation, entityType);
         pinata.setCustomName(getRandomNameTag());
         pinata.setCustomNameVisible(true);
-        pinata.setRemoveWhenFarAway(false);
         pinata.setCanPickupItems(false);
         pinata.setGlowing(glowing);
         if (pinataSpeed >= 0) {
