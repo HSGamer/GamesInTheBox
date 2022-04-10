@@ -82,6 +82,7 @@ public class Pinata extends BaseArenaGame implements Listener {
         pinata.setCustomNameVisible(true);
         pinata.setCanPickupItems(false);
         pinata.setGlowing(glowing);
+        pinata.setCollidable(false);
         if (pinataSpeed >= 0) {
             AttributeInstance attributeInstance = pinata.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
             if (attributeInstance != null) {
