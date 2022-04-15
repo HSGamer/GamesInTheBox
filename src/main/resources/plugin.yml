@@ -6,4 +6,5 @@ authors: [ HSGamer ]
 description: Minigames in one region
 softdepend:
   - HolographicDisplays
+  - DecentHolograms
   - PlaceholderAPI

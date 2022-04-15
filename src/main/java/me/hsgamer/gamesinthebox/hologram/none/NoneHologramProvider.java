@@ -10,7 +10,7 @@ public class NoneHologramProvider implements HologramProvider {
     };
 
     @Override
-    public Hologram createHologram(Location location) {
+    public Hologram createHologram(Location location, String name) {
         return hologram;
     }
 }

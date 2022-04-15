@@ -4,6 +4,7 @@ import me.hsgamer.gamesinthebox.GamesInTheBox;
 import me.hsgamer.gamesinthebox.api.ArenaGame;
 import me.hsgamer.gamesinthebox.api.Hologram;
 import me.hsgamer.gamesinthebox.api.HologramProvider;
+import me.hsgamer.gamesinthebox.hologram.dh.DHHologramProvider;
 import me.hsgamer.gamesinthebox.hologram.hd.HDHologramProvider;
 import me.hsgamer.gamesinthebox.hologram.none.NoneHologramProvider;
 import me.hsgamer.gamesinthebox.util.LocationUtils;
@@ -26,7 +27,9 @@ public class HologramFeature extends ArenaFeature<HologramFeature.ArenaHologramF
 
     public HologramFeature(GamesInTheBox instance) {
         this.instance = instance;
-        if (Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays")) {
+        if (Bukkit.getPluginManager().isPluginEnabled("DecentHolograms")) {
+            hologramProvider = new DHHologramProvider();
+        } else if (Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays")) {
             hologramProvider = new HDHologramProvider(instance);
         } else {
             hologramProvider = new NoneHologramProvider();
@@ -91,7 +94,7 @@ public class HologramFeature extends ArenaFeature<HologramFeature.ArenaHologramF
                 if (texts.isEmpty()) return;
 
                 locations.forEach(location -> {
-                    Hologram hologram = hologramProvider.createHologram(location);
+                    Hologram hologram = hologramProvider.createHologram(location, arena.getName());
                     hologram.init();
                     holograms.add(Pair.of(hologram, texts));
                 });

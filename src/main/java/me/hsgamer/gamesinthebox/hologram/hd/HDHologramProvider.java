@@ -41,7 +41,7 @@ public class HDHologramProvider implements HologramProvider {
     }
 
     @Override
-    public Hologram createHologram(Location location) {
+    public Hologram createHologram(Location location, String name) {
         return new HDHologram(instance, location);
     }
 }
