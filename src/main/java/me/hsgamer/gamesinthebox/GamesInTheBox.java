@@ -73,7 +73,7 @@ public final class GamesInTheBox extends BasePlugin {
                         return arenaManager.getArenaByName(params.substring("state_".length())).map(ArenaUtils::getStateName).orElse("");
                     }
                     if (params.startsWith("current_game_")) {
-                        return arenaManager.getArenaByName("current_game_").map(ArenaUtils::getCurrentGame).orElse("");
+                        return arenaManager.getArenaByName(params.substring("current_game_".length())).map(ArenaUtils::getCurrentGame).orElse("");
                     }
                     if (params.startsWith("top_name_")) {
                         String selector = params.substring("top_name_".length());
