@@ -17,7 +17,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -122,11 +121,10 @@ public class DefuseTheBomb extends BaseArenaGame implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEntityEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) return;
         Entity entity = event.getRightClicked();
         if (!(entity instanceof TNTPrimed)) return;
         TNTPrimed tnt = (TNTPrimed) entity;
-        if (!(spawnedTNTs.contains(tnt))) return;
+        if (!(spawnedTNTs.remove(tnt))) return;
 
         Player player = event.getPlayer();
         pointFeature.applyPoint(player.getUniqueId(), pointAdd);
