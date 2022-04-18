@@ -35,6 +35,7 @@ public class DefuseTheBomb extends BaseArenaGame implements Listener {
     private int minFuseTicks;
     private int maxFuseTicks;
     private float explodeYield;
+    private boolean isDamage;
 
     public DefuseTheBomb(Arena arena, String name) {
         super(arena, name);
@@ -51,6 +52,7 @@ public class DefuseTheBomb extends BaseArenaGame implements Listener {
         minFuseTicks = getInstance("min-fuse-ticks", 20, Number.class).intValue();
         maxFuseTicks = getInstance("max-fuse-ticks", 40, Number.class).intValue();
         explodeYield = getInstance("explode-yield", 4.0f, Number.class).floatValue();
+        isDamage = getInstance("is-damage", false, Boolean.class);
     }
 
     @Override
@@ -62,6 +64,7 @@ public class DefuseTheBomb extends BaseArenaGame implements Listener {
         map.put("minFuseTicks", Editors.ofNumber("min-fuse-ticks"));
         map.put("maxFuseTicks", Editors.ofNumber("max-fuse-ticks"));
         map.put("explodeYield", Editors.ofNumber("explode-yield"));
+        map.put("isDamage", Editors.ofBoolean("is-damage"));
         map.putAll(BoundingFeature.getDefaultSettings());
         map.putAll(BoundingFeature.VectorOffsetSetting.getSettings("spawnOffset", "spawn-offset"));
         return map;
@@ -115,6 +118,10 @@ public class DefuseTheBomb extends BaseArenaGame implements Listener {
         if (!(damager instanceof TNTPrimed)) return;
         TNTPrimed tnt = (TNTPrimed) damager;
         if (!(spawnedTNTs.contains(tnt))) return;
+
+        if (!isDamage) {
+            event.setDamage(0);
+        }
 
         pointFeature.applyPoint(player.getUniqueId(), -pointMinus);
     }
