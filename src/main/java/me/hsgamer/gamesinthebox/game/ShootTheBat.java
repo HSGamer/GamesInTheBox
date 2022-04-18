@@ -57,6 +57,7 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
         Location location = boundingFeature.getRandomLocation(vectorOffsetSetting);
         World world = location.getWorld();
         assert world != null;
+        if (!world.getChunkAt(location).isLoaded()) return null;
         return world.spawn(location, Bat.class, bat -> {
             bat.setHealth(2);
             bat.setRemoveWhenFarAway(false);
@@ -83,7 +84,10 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
                 }
                 int size = spawnedBats.size();
                 if (size < maxSpawn) {
-                    spawnedBats.add(spawnBat());
+                    Bat bat = spawnBat();
+                    if (bat != null) {
+                        spawnedBats.add(bat);
+                    }
                 }
             }
         }.runTaskTimer(instance, 0, 5);

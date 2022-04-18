@@ -74,6 +74,7 @@ public class DefuseTheBomb extends BaseArenaGame implements Listener {
         Location location = boundingFeature.getRandomLocation(vectorOffsetSetting);
         World world = location.getWorld();
         assert world != null;
+        if (!world.getChunkAt(location).isLoaded()) return null;
         return world.spawn(location, TNTPrimed.class, tnt -> {
             tnt.setFuseTicks(ThreadLocalRandom.current().nextInt(minFuseTicks, maxFuseTicks + 1));
             tnt.setYield(explodeYield);
@@ -98,7 +99,10 @@ public class DefuseTheBomb extends BaseArenaGame implements Listener {
                 }
                 int size = spawnedTNTs.size();
                 if (size < maxSpawn) {
-                    spawnedTNTs.add(spawnTNT());
+                    TNTPrimed tnt = spawnTNT();
+                    if (tnt != null) {
+                        spawnedTNTs.add(tnt);
+                    }
                 }
             }
         }.runTaskTimer(instance, 0, 1);

@@ -13,6 +13,7 @@ import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -77,6 +78,10 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
         do {
             location = boundingFeature.getRandomLocation();
         } while (spawnBlocks.containsKey(location));
+        World world = location.getWorld();
+        assert world != null;
+        if (!world.getChunkAt(location).isLoaded()) return null;
+
         XMaterial xMaterial = materialRandomness.get();
         Material material = Optional.ofNullable(xMaterial.parseMaterial()).orElse(Material.STONE);
         Block block = location.getBlock();
@@ -92,9 +97,11 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
             public void run() {
                 if (spawnBlocks.size() < maxBlock) {
                     Pair<Location, XMaterial> blockPair = spawnNewLocation();
-                    Location location = blockPair.getKey();
-                    int point = materialScoreMap.getOrDefault(blockPair.getValue(), defaultPoint);
-                    spawnBlocks.put(location, point);
+                    if (blockPair != null) {
+                        Location location = blockPair.getKey();
+                        int point = materialScoreMap.getOrDefault(blockPair.getValue(), defaultPoint);
+                        spawnBlocks.put(location, point);
+                    }
                 }
             }
         }.runTaskTimer(instance, 0, 5);
