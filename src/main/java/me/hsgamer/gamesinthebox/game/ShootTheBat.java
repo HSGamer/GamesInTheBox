@@ -60,7 +60,6 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
         if (!world.getChunkAt(location).isLoaded()) return null;
         return world.spawn(location, Bat.class, bat -> {
             bat.setHealth(2);
-            bat.setRemoveWhenFarAway(false);
             bat.setGlowing(true);
             bat.setCustomName(getRandomNameTag());
             bat.setCustomNameVisible(true);
