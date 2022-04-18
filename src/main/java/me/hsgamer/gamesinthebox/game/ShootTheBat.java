@@ -47,7 +47,7 @@ public class ShootTheBat extends BaseArenaGame implements Listener {
     protected Map<String, ArenaGameEditor> getAdditionalEditors() {
         Map<String, ArenaGameEditor> map = new HashMap<>();
         map.put("point", Editors.ofNumber("point"));
-        map.put("maxSpawn", Editors.ofNumber("maxSpawn"));
+        map.put("maxSpawn", Editors.ofNumber("max-spawn"));
         map.putAll(BoundingFeature.getDefaultSettings());
         map.putAll(BoundingFeature.VectorOffsetSetting.getSettings("spawnOffset", "spawn-offset"));
         return map;

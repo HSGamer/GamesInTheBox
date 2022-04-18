@@ -250,4 +250,31 @@ public interface MessageConfig {
         return "&eThe arena {name} was ended. Thanks!";
     }
     //endregion
+
+    //region Defuse The Bomb
+    @ConfigPath("defuse-the-bomb.name")
+    default String getDefuseTheBombDisplayName() {
+        return "&cDefuse The Bomb";
+    }
+
+    @ConfigPath(value = "defuse-the-bomb.description", converter = StringListConverter.class)
+    default List<String> getDefuseTheBombDescription() {
+        return List.of("&7A game where you have to defuse the bomb");
+    }
+
+    @ConfigPath("defuse-the-bomb.start-broadcast")
+    default String getDefuseTheBombStartBroadcast() {
+        return "&aThe arena {name} was started. Defuse the bomb!";
+    }
+
+    @ConfigPath("defuse-the-bomb.end-broadcast")
+    default String getDefuseTheBombEndBroadcast() {
+        return "&eThe arena {name} was ended. Thanks!";
+    }
+
+    @ConfigPath(value = "defuse-the-bomb.name-tag", converter = StringListConverter.class)
+    default List<String> getDefuseTheBombNameTag() {
+        return List.of("&c&lDEFUSE ME!", "&c&lHERE!", "&c&lCAREFUL!");
+    }
+    //endregion
 }
