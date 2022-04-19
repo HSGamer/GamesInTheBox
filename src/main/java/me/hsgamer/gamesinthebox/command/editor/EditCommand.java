@@ -11,7 +11,10 @@ import me.hsgamer.minigamecore.base.Arena;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EditCommand extends SubCommand {
@@ -78,11 +81,7 @@ public class EditCommand extends SubCommand {
                     .collect(Collectors.toList());
         } else if (args.length == 2) {
             return instance.getArenaManager().getFeature(EditorFeature.class).getArena(args[0])
-                    .map(arena -> {
-                        List<String> list = new ArrayList<>(arena.getArenaFeature(GameFeature.class).getAvailableGames());
-                        list.addAll(arena.getArenaFeature(EditorFeature.class).getEditingGames());
-                        return list;
-                    })
+                    .map(arena -> arena.getArenaFeature(EditorFeature.class).getAllGames())
                     .orElse(Collections.emptyList());
         } else if (args.length == 3) {
             return List.of("true", "false");

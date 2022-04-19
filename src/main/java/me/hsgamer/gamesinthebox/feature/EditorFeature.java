@@ -9,10 +9,7 @@ import me.hsgamer.minigamecore.base.Arena;
 import me.hsgamer.minigamecore.base.ArenaFeature;
 import me.hsgamer.minigamecore.base.Feature;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class EditorFeature extends ArenaFeature<EditorFeature.ArenaEditorFeature> {
     private final GamesInTheBox instance;
@@ -87,6 +84,12 @@ public class EditorFeature extends ArenaFeature<EditorFeature.ArenaEditorFeature
 
         public void addGame(ArenaGame game) {
             editingGames.put(game.getName(), game);
+        }
+
+        public List<String> getAllGames() {
+            List<String> list = new ArrayList<>(arena.getArenaFeature(GameFeature.class).getAvailableGames());
+            list.addAll(arena.getArenaFeature(EditorFeature.class).getEditingGames());
+            return list;
         }
     }
 }

@@ -2,7 +2,6 @@ package me.hsgamer.gamesinthebox.command.editor;
 
 import me.hsgamer.gamesinthebox.GamesInTheBox;
 import me.hsgamer.gamesinthebox.feature.EditorFeature;
-import me.hsgamer.gamesinthebox.feature.GameFeature;
 import me.hsgamer.hscore.bukkit.command.sub.SubCommand;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import org.bukkit.command.CommandSender;
@@ -58,8 +57,7 @@ public class DeleteCommand extends SubCommand {
                     .collect(Collectors.toList());
         } else if (args.length == 2) {
             return instance.getArenaManager().getFeature(EditorFeature.class).getArena(args[0])
-                    .map(arena -> arena.getArenaFeature(GameFeature.class))
-                    .map(GameFeature.ArenaGameFeature::getAvailableGames)
+                    .map(arena -> arena.getArenaFeature(EditorFeature.class).getAllGames())
                     .orElse(Collections.emptyList());
         }
         return super.onTabComplete(sender, label, args);
