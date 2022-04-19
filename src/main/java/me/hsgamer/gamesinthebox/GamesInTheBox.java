@@ -7,10 +7,13 @@ import me.hsgamer.gamesinthebox.config.MainConfig;
 import me.hsgamer.gamesinthebox.config.MessageConfig;
 import me.hsgamer.gamesinthebox.manager.GameArenaManager;
 import me.hsgamer.gamesinthebox.util.ArenaUtils;
+import me.hsgamer.hscore.bukkit.addon.PluginAddonManager;
 import me.hsgamer.hscore.bukkit.baseplugin.BasePlugin;
 import me.hsgamer.hscore.bukkit.config.BukkitConfig;
+import me.hsgamer.hscore.bukkit.config.BukkitConfigProvider;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.hscore.common.Pair;
+import me.hsgamer.hscore.config.ConfigProvider;
 import me.hsgamer.hscore.config.proxy.ConfigGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -23,16 +26,29 @@ public final class GamesInTheBox extends BasePlugin {
     private final MessageConfig messageConfig = ConfigGenerator.newInstance(MessageConfig.class, new BukkitConfig(this, "messages.yml"));
     private final BukkitConfig arenaConfig = new BukkitConfig(this, "arenas.yml");
     private final GameArenaManager arenaManager = new GameArenaManager(this);
+    private final PluginAddonManager addonManager = new PluginAddonManager(this) {
+        @Override
+        public @NotNull String getAddonConfigFileName() {
+            return "addon.yml";
+        }
+
+        @Override
+        public @NotNull ConfigProvider<?> getConfigProvider() {
+            return new BukkitConfigProvider();
+        }
+    };
 
     @Override
     public void load() {
         arenaConfig.setup();
+        addonManager.loadAddons();
         MessageUtils.setPrefix(messageConfig::getPrefix);
     }
 
     @Override
     public void enable() {
         Permissions.addPermissions();
+        addonManager.enableAddons();
         arenaManager.init();
         arenaManager.postInit();
         registerCommand(new AdminCommand(this));
@@ -41,6 +57,7 @@ public final class GamesInTheBox extends BasePlugin {
 
     @Override
     public void postEnable() {
+        addonManager.callPostEnable();
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             GamesInTheBox instance = this;
             PlaceholderExpansion expansion = new PlaceholderExpansion() {
@@ -96,6 +113,7 @@ public final class GamesInTheBox extends BasePlugin {
     @Override
     public void disable() {
         arenaManager.clear();
+        addonManager.disableAddons();
         Permissions.removePermissions();
     }
 
@@ -113,5 +131,9 @@ public final class GamesInTheBox extends BasePlugin {
 
     public GameArenaManager getArenaManager() {
         return arenaManager;
+    }
+
+    public PluginAddonManager getAddonManager() {
+        return addonManager;
     }
 }

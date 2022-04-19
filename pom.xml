@@ -159,6 +159,11 @@
             <artifactId>hscore-crontime</artifactId>
             <version>${core.version}</version>
         </dependency>
+        <dependency>
+            <groupId>me.hsgamer</groupId>
+            <artifactId>hscore-bukkit-addon</artifactId>
+            <version>${core.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>me.hsgamer</groupId>
