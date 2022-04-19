@@ -102,12 +102,10 @@ public final class Utils {
         HashSet<Chunk> chunks = new HashSet<>();
         locations.forEach(location -> {
             Block block = location.getBlock();
-            BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, false);
+            BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, true, true);
+            BlockUtil.updateLight(block);
             chunks.add(block.getChunk());
         });
-        chunks.forEach(chunk -> {
-            BlockUtil.getHandler().updateLight(chunk);
-            BlockUtil.getHandler().sendChunkUpdate(chunk);
-        });
+        chunks.forEach(chunk -> BlockUtil.getHandler().sendChunkUpdate(chunk));
     }
 }
