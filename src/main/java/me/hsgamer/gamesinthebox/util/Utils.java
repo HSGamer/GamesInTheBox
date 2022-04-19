@@ -103,9 +103,11 @@ public final class Utils {
         locations.forEach(location -> {
             Block block = location.getBlock();
             BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, false);
-            BlockUtil.updateLight(block);
             chunks.add(block.getChunk());
         });
-        chunks.forEach(chunk -> BlockUtil.getHandler().sendChunkUpdate(chunk));
+        chunks.forEach(chunk -> {
+            BlockUtil.getHandler().updateLight(chunk);
+            BlockUtil.getHandler().sendChunkUpdate(chunk);
+        });
     }
 }
