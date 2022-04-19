@@ -32,6 +32,13 @@ public class HDHologram implements Hologram {
 
     @Override
     public void clear() {
-        hologram.delete();
+        try {
+            if (hologram != null) {
+                hologram.delete();
+                hologram = null;
+            }
+        } catch (Exception ignored) {
+            // IGNORED
+        }
     }
 }
