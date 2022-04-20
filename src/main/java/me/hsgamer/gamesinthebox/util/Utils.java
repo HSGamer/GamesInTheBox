@@ -106,6 +106,6 @@ public final class Utils {
             BlockUtil.updateLight(block);
             chunks.add(block.getChunk());
         });
-        chunks.forEach(chunk -> BlockUtil.getHandler().sendChunkUpdate(chunk));
+        chunks.forEach(BlockUtil::sendChunkUpdate);
     }
 }

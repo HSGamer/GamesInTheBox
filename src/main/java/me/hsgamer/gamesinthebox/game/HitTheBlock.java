@@ -87,7 +87,7 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
         Block block = location.getBlock();
         BlockUtil.getHandler().setBlock(block, material, xMaterial.getData(), false, true);
         BlockUtil.getHandler().updateLight(block);
-        BlockUtil.getHandler().sendChunkUpdate(block.getChunk());
+        BlockUtil.sendChunkUpdate(block.getChunk());
         return Pair.of(location, xMaterial);
     }
 
@@ -127,7 +127,7 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
                         break;
                     }
                 }
-                chunks.forEach(chunk -> BlockUtil.getHandler().sendChunkUpdate(chunk));
+                chunks.forEach(BlockUtil::sendChunkUpdate);
                 chunks.clear();
             }
         }.runTaskTimer(instance, 0, 0);
@@ -157,7 +157,7 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
 
         BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, true);
         BlockUtil.getHandler().updateLight(block);
-        BlockUtil.getHandler().sendChunkUpdate(block.getChunk());
+        BlockUtil.sendChunkUpdate(block.getChunk());
 
         if (!(source instanceof Player)) return;
         Player player = (Player) source;

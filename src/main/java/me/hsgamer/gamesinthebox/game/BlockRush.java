@@ -181,7 +181,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
                         break;
                     }
                 }
-                chunks.forEach(chunk -> BlockUtil.getHandler().sendChunkUpdate(chunk));
+                chunks.forEach(BlockUtil::sendChunkUpdate);
             }
         };
         BukkitTask task = runnable.runTaskTimer(instance, 0, 0);
@@ -215,7 +215,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
                         break;
                     }
                 }
-                chunks.forEach(chunk -> BlockUtil.getHandler().sendChunkUpdate(chunk));
+                chunks.forEach(BlockUtil::sendChunkUpdate);
             }
         };
         BukkitTask task = runnable.runTaskTimer(instance, 0, 0);
