@@ -42,6 +42,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
     private BlockIterator blockIterator;
     private int point;
     private int blocksPerTick;
+    private long blockDelay;
     private boolean placeOnlyOnAir;
     private ProbabilityCollection<XMaterial> materialRandomness;
 
@@ -58,6 +59,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
         point = getInstance("point", 1, Number.class).intValue();
 
         blocksPerTick = getInstance("blocks-per-tick", 1, Number.class).intValue();
+        blockDelay = getInstance("block-delay", 0, Number.class).longValue();
         placeOnlyOnAir = getInstance("place-only-on-air", false, Boolean.class);
 
         materialRandomness = Utils.parseMaterialProbability(getValues("material", false));
@@ -72,6 +74,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
         map.put("boundingIterator", Editors.ofString("bounding-iterator"));
         map.put("point", Editors.ofNumber("point"));
         map.put("blocksPerTick", Editors.ofNumber("blocks-per-tick"));
+        map.put("blockDelay", Editors.ofNumber("block-delay"));
         map.put("placeOnlyOnAir", Editors.ofBoolean("place-only-on-air"));
         map.put("material", Editors.ofMap("material", " "));
         map.putAll(BoundingFeature.getDefaultSettings());
@@ -184,7 +187,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
                 chunks.forEach(BlockUtil::sendChunkUpdate);
             }
         };
-        BukkitTask task = runnable.runTaskTimer(instance, 0, 0);
+        BukkitTask task = runnable.runTaskTimer(instance, blockDelay, blockDelay);
         currentTask.set(task);
     }
 
@@ -218,7 +221,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
                 chunks.forEach(BlockUtil::sendChunkUpdate);
             }
         };
-        BukkitTask task = runnable.runTaskTimer(instance, 0, 0);
+        BukkitTask task = runnable.runTaskTimer(instance, blockDelay, blockDelay);
         currentTask.set(task);
     }
 
