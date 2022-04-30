@@ -24,4 +24,14 @@ public interface MainConfig {
     default String getNullTopValue() {
         return "---";
     }
+
+    @ConfigPath("block-handler.blocks-per-tick")
+    default int getBlocksPerTick() {
+        return 20;
+    }
+
+    @ConfigPath("block-handler.block-delay")
+    default int getBlockDelay() {
+        return 5;
+    }
 }

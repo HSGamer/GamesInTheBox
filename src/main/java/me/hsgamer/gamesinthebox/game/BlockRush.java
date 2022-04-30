@@ -3,19 +3,15 @@ package me.hsgamer.gamesinthebox.game;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XTag;
 import com.lewdev.probabilitylib.ProbabilityCollection;
-import me.hsgamer.blockutil.api.BlockUtil;
-import me.hsgamer.blockutil.extra.iterator.BlockIteratorUtil;
-import me.hsgamer.blockutil.extra.iterator.api.BlockIterator;
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.api.editor.ArenaGameEditor;
 import me.hsgamer.gamesinthebox.api.editor.Editors;
+import me.hsgamer.gamesinthebox.feature.BlockFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.state.InGameState;
 import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.minigamecore.base.Arena;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -27,23 +23,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class BlockRush extends BaseArenaGame implements Listener {
-    private final List<Location> blockLocations = new ArrayList<>();
-    private final AtomicBoolean isWorking = new AtomicBoolean(false);
-    private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
+    private final AtomicReference<BlockFeature.BlockProcess> currentTask = new AtomicReference<>();
     private BoundingFeature boundingFeature;
-    private BlockIterator blockIterator;
     private int point;
-    private int blocksPerTick;
-    private long blockDelay;
-    private boolean placeOnlyOnAir;
     private ProbabilityCollection<XMaterial> materialRandomness;
 
     public BlockRush(Arena arena, String name) {
@@ -54,13 +44,8 @@ public class BlockRush extends BaseArenaGame implements Listener {
     public void init() {
         super.init();
         boundingFeature = BoundingFeature.of(this, false);
-        blockIterator = BlockIteratorUtil.get(getString("bounding-iterator", "default"), boundingFeature.getBlockBox());
 
         point = getInstance("point", 1, Number.class).intValue();
-
-        blocksPerTick = getInstance("blocks-per-tick", 1, Number.class).intValue();
-        blockDelay = getInstance("block-delay", 0, Number.class).longValue();
-        placeOnlyOnAir = getInstance("place-only-on-air", false, Boolean.class);
 
         materialRandomness = Utils.parseMaterialProbability(getValues("material", false));
         if (materialRandomness.isEmpty()) {
@@ -71,11 +56,7 @@ public class BlockRush extends BaseArenaGame implements Listener {
     @Override
     protected Map<String, ArenaGameEditor> getAdditionalEditors() {
         Map<String, ArenaGameEditor> map = new HashMap<>();
-        map.put("boundingIterator", Editors.ofString("bounding-iterator"));
         map.put("point", Editors.ofNumber("point"));
-        map.put("blocksPerTick", Editors.ofNumber("blocks-per-tick"));
-        map.put("blockDelay", Editors.ofNumber("block-delay"));
-        map.put("placeOnlyOnAir", Editors.ofBoolean("place-only-on-air"));
         map.put("material", Editors.ofMap("material", " "));
         map.putAll(BoundingFeature.getDefaultSettings());
         return map;
@@ -110,11 +91,10 @@ public class BlockRush extends BaseArenaGame implements Listener {
     public void onBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         Location location = block.getLocation();
-        if (!blockLocations.contains(location)) return;
+        if (!boundingFeature.checkBounding(location)) return;
 
         if (arena.getState() == InGameState.class) {
             pointFeature.applyPoint(event.getPlayer().getUniqueId(), point);
-            blockLocations.remove(location);
         } else {
             event.setCancelled(true);
         }
@@ -122,23 +102,20 @@ public class BlockRush extends BaseArenaGame implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlocExplode(BlockExplodeEvent event) {
-        if (arena.getState() == InGameState.class) {
-            for (Block block : event.blockList()) {
-                blockLocations.remove(block.getLocation());
-            }
-        } else {
-            event.blockList().removeIf(block -> blockLocations.contains(block.getLocation()));
+        if (arena.getState() != InGameState.class) {
+            event.blockList().removeIf(block -> boundingFeature.checkBounding(block.getLocation()));
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent event) {
         if (arena.getState() != InGameState.class) {
-            event.blockList().removeIf(block -> blockLocations.contains(block.getLocation()));
+            event.blockList().removeIf(block -> boundingFeature.checkBounding(block.getLocation()));
             return;
         }
 
         Entity entity = event.getEntity();
+        if (entity.getWorld() != boundingFeature.getWorld()) return;
         Entity source;
         do {
             source = entity instanceof TNTPrimed ? ((TNTPrimed) entity).getSource() : null;
@@ -147,7 +124,8 @@ public class BlockRush extends BaseArenaGame implements Listener {
 
         int count = 0;
         for (Block block : event.blockList()) {
-            if (blockLocations.remove(block.getLocation())) {
+            if (XTag.AIR.isTagged(XMaterial.matchXMaterial(block.getType()))) continue;
+            if (boundingFeature.checkBounding(block.getLocation())) {
                 count++;
             }
         }
@@ -161,92 +139,44 @@ public class BlockRush extends BaseArenaGame implements Listener {
     public void onWaitingStart() {
         super.onWaitingStart();
         instance.registerListener(this);
-        isWorking.set(true);
-
-        HashSet<Chunk> chunks = new HashSet<>();
-        BukkitRunnable runnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < blocksPerTick; i++) {
-                    if (blockIterator.hasNext()) {
-                        Block block = blockIterator.nextLocation(boundingFeature.getWorld()).getBlock();
-                        if (!placeOnlyOnAir || !XTag.AIR.isTagged(XMaterial.matchXMaterial(block.getType()))) {
-                            XMaterial xMaterial = materialRandomness.get();
-                            Material material = Optional.ofNullable(xMaterial.parseMaterial()).orElse(Material.STONE);
-                            BlockUtil.getHandler().setBlock(block, material, xMaterial.getData(), false, true);
-                            BlockUtil.updateLight(block);
-                            blockLocations.add(block.getLocation());
-                            chunks.add(block.getChunk());
-                        }
-                    } else {
-                        cancel();
-                        isWorking.lazySet(false);
-                        break;
-                    }
-                }
-                chunks.forEach(BlockUtil::sendChunkUpdate);
-            }
-        };
-        BukkitTask task = runnable.runTaskTimer(instance, blockDelay, blockDelay);
-        currentTask.set(task);
+        BlockFeature.BlockProcess process = arena.getFeature(BlockFeature.class).getBlockHandler().setRandomBlocks(
+                boundingFeature.getWorld(), boundingFeature.getBlockBox(),
+                materialRandomness
+        );
+        currentTask.set(process);
     }
 
     @Override
     public boolean isWaitingOver() {
-        return super.isWaitingOver() && !isWorking.get();
+        return super.isWaitingOver() && (currentTask.get() == null || currentTask.get().isDone());
     }
 
     @Override
     public void onEndingStart() {
         super.onEndingStart();
-
-        Iterator<Location> iterator = blockLocations.iterator();
-        isWorking.set(true);
-        HashSet<Chunk> chunks = new HashSet<>();
-        BukkitRunnable runnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < blocksPerTick; i++) {
-                    if (iterator.hasNext()) {
-                        Block block = iterator.next().getBlock();
-                        BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, false);
-                        BlockUtil.updateLight(block);
-                        chunks.add(block.getChunk());
-                    } else {
-                        cancel();
-                        isWorking.lazySet(false);
-                        break;
-                    }
-                }
-                chunks.forEach(BlockUtil::sendChunkUpdate);
-            }
-        };
-        BukkitTask task = runnable.runTaskTimer(instance, blockDelay, blockDelay);
-        currentTask.set(task);
+        BlockFeature.BlockProcess process = arena.getFeature(BlockFeature.class).getBlockHandler().clearBlocks(
+                boundingFeature.getWorld(), boundingFeature.getBlockBox()
+        );
+        currentTask.set(process);
     }
 
     @Override
     public boolean isEndingOver() {
-        return !isWorking.get();
+        return super.isEndingOver() && (currentTask.get() == null || currentTask.get().isDone());
     }
 
     @Override
     public void onEndingOver() {
         super.onEndingOver();
-        blockIterator.reset();
-        blockLocations.clear();
         HandlerList.unregisterAll(this);
     }
 
     @Override
     public void clear() {
-        Utils.cancelSafe(currentTask.getAndSet(null));
-        Utils.clearAllBlocks(blockLocations);
+        Optional.ofNullable(currentTask.get()).ifPresent(BlockFeature.BlockProcess::cancel);
+        arena.getFeature(BlockFeature.class).getBlockHandler().clearBlocksFast(boundingFeature.getWorld(), boundingFeature.getBlockBox());
         HandlerList.unregisterAll(this);
         boundingFeature.clear();
-        blockIterator.reset();
-        blockLocations.clear();
-        isWorking.set(false);
         super.clear();
     }
 }

@@ -40,7 +40,8 @@ public class GameArenaManager extends LoadedArenaManager {
                 new CooldownFeature(instance),
                 new HologramFeature(instance),
                 new TopFeature(instance),
-                new EditorFeature(instance)
+                new EditorFeature(instance),
+                new BlockFeature(instance)
         );
     }
 

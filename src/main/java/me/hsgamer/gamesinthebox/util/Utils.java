@@ -2,13 +2,8 @@ package me.hsgamer.gamesinthebox.util;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.lewdev.probabilitylib.ProbabilityCollection;
-import me.hsgamer.blockutil.api.BlockUtil;
 import me.hsgamer.hscore.bukkit.utils.MessageUtils;
 import me.hsgamer.hscore.common.CollectionUtils;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Entity;
@@ -96,16 +91,5 @@ public final class Utils {
             // IGNORED
         }
         return defaultValue;
-    }
-
-    public static void clearAllBlocks(Collection<Location> locations) {
-        HashSet<Chunk> chunks = new HashSet<>();
-        locations.forEach(location -> {
-            Block block = location.getBlock();
-            BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, true, true);
-            BlockUtil.updateLight(block);
-            chunks.add(block.getChunk());
-        });
-        chunks.forEach(BlockUtil::sendChunkUpdate);
     }
 }

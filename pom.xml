@@ -45,14 +45,6 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <minimizeJar>true</minimizeJar>
-                            <filters>
-                                <filter>
-                                    <artifact>me.hsgamer:block-util-*</artifact>
-                                    <includes>
-                                        <include>**</include>
-                                    </includes>
-                                </filter>
-                            </filters>
                             <relocations>
                                 <relocation>
                                     <pattern>me.hsgamer.hscore</pattern>
@@ -176,11 +168,6 @@
             <version>${minigamecore.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>me.hsgamer</groupId>
-            <artifactId>block-util-api</artifactId>
-            <version>${blockutil.version}</version>
-        </dependency>
         <dependency>
             <groupId>me.hsgamer</groupId>
             <artifactId>block-util-extra</artifactId>

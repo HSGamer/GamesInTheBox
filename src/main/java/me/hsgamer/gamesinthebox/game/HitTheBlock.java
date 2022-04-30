@@ -1,18 +1,17 @@
 package me.hsgamer.gamesinthebox.game;
 
+import com.cryptomorin.xseries.XBlock;
 import com.cryptomorin.xseries.XMaterial;
 import com.lewdev.probabilitylib.ProbabilityCollection;
-import me.hsgamer.blockutil.api.BlockUtil;
 import me.hsgamer.gamesinthebox.api.BaseArenaGame;
 import me.hsgamer.gamesinthebox.api.editor.ArenaGameEditor;
 import me.hsgamer.gamesinthebox.api.editor.Editors;
+import me.hsgamer.gamesinthebox.feature.BlockFeature;
 import me.hsgamer.gamesinthebox.feature.game.BoundingFeature;
 import me.hsgamer.gamesinthebox.util.Utils;
 import me.hsgamer.hscore.common.Pair;
 import me.hsgamer.minigamecore.base.Arena;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -28,13 +27,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class HitTheBlock extends BaseArenaGame implements Listener {
     private final Map<Location, Integer> spawnBlocks = new HashMap<>();
-    private final AtomicBoolean isWorking = new AtomicBoolean(false);
-    private final AtomicReference<BukkitTask> currentTask = new AtomicReference<>();
+    private final AtomicReference<BlockFeature.BlockProcess> currentTask = new AtomicReference<>();
     private BoundingFeature boundingFeature;
     private int maxBlock;
     private ProbabilityCollection<XMaterial> materialRandomness;
@@ -83,16 +80,13 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
         if (!world.getChunkAt(location).isLoaded()) return null;
 
         XMaterial xMaterial = materialRandomness.get();
-        Material material = Optional.ofNullable(xMaterial.parseMaterial()).orElse(Material.STONE);
         Block block = location.getBlock();
-        BlockUtil.getHandler().setBlock(block, material, xMaterial.getData(), false, true);
-        BlockUtil.getHandler().updateLight(block);
-        BlockUtil.sendChunkUpdate(block.getChunk());
+        XBlock.setType(block, xMaterial, false);
         return Pair.of(location, xMaterial);
     }
 
-    private BukkitTask createBlockTask() {
-        return new BukkitRunnable() {
+    private BlockFeature.BlockProcess createBlockTask() {
+        BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
                 if (spawnBlocks.size() < maxBlock) {
@@ -105,32 +99,17 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
                 }
             }
         }.runTaskTimer(instance, 0, 5);
-    }
-
-    private BukkitTask createClearBlockTask() {
-        isWorking.set(true);
-        return new BukkitRunnable() {
-            private final ListIterator<Location> iterator = new ArrayList<>(spawnBlocks.keySet()).listIterator();
-            private final HashSet<Chunk> chunks = new HashSet<>();
+        return new BlockFeature.BlockProcess() {
+            @Override
+            public boolean isDone() {
+                return false;
+            }
 
             @Override
-            public void run() {
-                for (int i = 0; i < 10; i++) {
-                    if (iterator.hasNext()) {
-                        Location location = iterator.next();
-                        Block block = location.getBlock();
-                        chunks.add(block.getChunk());
-                        BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, true);
-                    } else {
-                        cancel();
-                        isWorking.set(false);
-                        break;
-                    }
-                }
-                chunks.forEach(BlockUtil::sendChunkUpdate);
-                chunks.clear();
+            public void cancel() {
+                Utils.cancelSafe(task);
             }
-        }.runTaskTimer(instance, 0, 0);
+        };
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -155,9 +134,7 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
         int point = spawnBlocks.remove(location);
         if (removeProjectileOnHit) projectile.remove();
 
-        BlockUtil.getHandler().setBlock(block, Material.AIR, (byte) 0, false, true);
-        BlockUtil.getHandler().updateLight(block);
-        BlockUtil.sendChunkUpdate(block.getChunk());
+        XBlock.setType(block, XMaterial.AIR, false);
 
         if (!(source instanceof Player)) return;
         Player player = (Player) source;
@@ -199,32 +176,31 @@ public class HitTheBlock extends BaseArenaGame implements Listener {
     @Override
     public void onInGameOver() {
         super.onInGameOver();
-        Utils.cancelSafe(currentTask.getAndSet(null));
+        Optional.ofNullable(currentTask.getAndSet(null)).ifPresent(BlockFeature.BlockProcess::cancel);
     }
 
     @Override
     public void onEndingStart() {
         super.onEndingStart();
-        currentTask.set(createClearBlockTask());
+        currentTask.set(arena.getFeature(BlockFeature.class).getBlockHandler().clearBlocks(new ArrayList<>(spawnBlocks.keySet())));
     }
 
     @Override
     public boolean isEndingOver() {
-        return !isWorking.get();
+        return currentTask.get() == null || currentTask.get().isDone();
     }
 
     @Override
     public void onEndingOver() {
         super.onEndingOver();
-        Utils.cancelSafe(currentTask.getAndSet(null));
+        Optional.ofNullable(currentTask.getAndSet(null)).ifPresent(BlockFeature.BlockProcess::cancel);
         HandlerList.unregisterAll(this);
     }
 
     @Override
     public void clear() {
-        Utils.cancelSafe(currentTask.getAndSet(null));
-        isWorking.set(false);
-        Utils.clearAllBlocks(spawnBlocks.keySet());
+        Optional.ofNullable(currentTask.getAndSet(null)).ifPresent(BlockFeature.BlockProcess::cancel);
+        arena.getFeature(BlockFeature.class).getBlockHandler().clearBlocksFast(new ArrayList<>(spawnBlocks.keySet()));
         spawnBlocks.clear();
         HandlerList.unregisterAll(this);
         boundingFeature.clear();
